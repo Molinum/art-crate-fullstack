@@ -1,0 +1,448 @@
+/* ==========================================================
+   ArtCrate - hoja de estilos propia
+   Se carga DESPUÉS de Bootstrap, así que lo que escribimos aquí
+   puede sobrescribir los estilos de Bootstrap.
+   Cada sección indica si ajusta algo de Bootstrap o si es 100% propia.
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   1. VARIABLES (propio) - paleta y tipografías
+   Las variables --ac-* son nuestras. Las --bs-* son variables
+   de Bootstrap: al redefinirlas, Bootstrap usa nuestros colores.
+   ---------------------------------------------------------- */
+:root {
+  /* Paleta cálida y artesanal */
+  --ac-crema: #F6EFE4;
+  --ac-papel: #FFFFFF;
+  --ac-terracota: #C4623F;
+  --ac-terracota-oscuro: #A24E30;
+  --ac-oliva: #6B7A3A;
+  --ac-marron: #3B2A20;
+  --ac-arena: #E4D8C5;
+
+  /* Tipografías */
+  --ac-fuente-titulos: "Playfair Display", Georgia, serif;
+  --ac-fuente-texto: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Variables de Bootstrap sobrescritas con nuestra paleta */
+  --bs-body-bg: var(--ac-crema);
+  --bs-body-color: var(--ac-marron);
+  --bs-body-font-family: var(--ac-fuente-texto);
+  --bs-primary: var(--ac-terracota);
+  --bs-primary-rgb: 196, 98, 63;
+  --bs-link-color: var(--ac-terracota-oscuro);
+  --bs-link-color-rgb: 162, 78, 48;
+  --bs-link-hover-color: var(--ac-marron);
+  --bs-link-hover-color-rgb: 59, 42, 32;
+}
+
+/* ----------------------------------------------------------
+   2. BASE (propio) - estilos generales del sitio
+   ---------------------------------------------------------- */
+h1, h2, h3, h4 {
+  font-family: var(--ac-fuente-titulos);
+  color: var(--ac-marron);
+}
+
+/* Botón principal: Bootstrap lo pinta con sus variables --bs-btn-*;
+   aquí las cambiamos por los colores de ArtCrate */
+.btn-primary {
+  --bs-btn-bg: var(--ac-terracota);
+  --bs-btn-border-color: var(--ac-terracota);
+  --bs-btn-hover-bg: var(--ac-terracota-oscuro);
+  --bs-btn-hover-border-color: var(--ac-terracota-oscuro);
+  --bs-btn-active-bg: var(--ac-terracota-oscuro);
+  --bs-btn-active-border-color: var(--ac-terracota-oscuro);
+  --bs-btn-disabled-bg: var(--ac-terracota);
+  --bs-btn-disabled-border-color: var(--ac-terracota);
+}
+
+/* ----------------------------------------------------------
+   3. ENCABEZADO Y NAVEGACIÓN (ajusta el navbar de Bootstrap)
+   La estructura y el colapso responsive los da Bootstrap;
+   aquí solo cambiamos colores y bordes.
+   ---------------------------------------------------------- */
+header .navbar {
+  background-color: var(--ac-papel);
+  border-bottom: 3px solid var(--ac-terracota);
+}
+
+header .navbar-brand img {
+  height: 40px;
+  width: auto;
+}
+
+header .nav-link {
+  color: var(--ac-marron);
+  font-weight: 600;
+}
+
+header .nav-link:hover,
+header .nav-link.active {
+  color: var(--ac-terracota);
+}
+
+/* ----------------------------------------------------------
+   4. PIE DE PÁGINA (propio; usa la grilla de Bootstrap)
+   ---------------------------------------------------------- */
+.pie {
+  background-color: var(--ac-marron);
+  color: var(--ac-crema);
+  margin-top: 3rem;
+}
+
+.pie h2 {
+  color: #FFFFFF;
+}
+
+.pie a {
+  color: var(--ac-arena);
+}
+
+.pie a:hover,
+.pie a[aria-current="page"] {
+  color: #E9906F;
+}
+
+/* ----------------------------------------------------------
+   5. INICIO (propio) - banner y secciones destacadas
+   ---------------------------------------------------------- */
+
+/* Banner: imagen de fondo con una capa oscura encima para que el texto blanco se lea bien */
+.hero {
+  background:
+    linear-gradient(rgba(59, 42, 32, 0.7), rgba(59, 42, 32, 0.7)),
+    url("/assets/img/banner-inicio.svg") center / cover no-repeat;
+  color: #FFFFFF;
+}
+
+.hero h1 {
+  color: #FFFFFF;
+  font-size: calc(1.8rem + 1.5vw);
+}
+
+/* Tarjetas de categorías y productos (el aspecto base es de Bootstrap) */
+.tarjeta-categoria,
+.tarjeta-producto {
+  background-color: var(--ac-papel);
+  border-color: var(--ac-arena);
+  overflow: hidden;
+}
+
+.tarjeta-categoria .card-title a,
+.tarjeta-producto .card-title a {
+  color: var(--ac-marron);
+  text-decoration: none;
+}
+
+.precio {
+  color: var(--ac-terracota-oscuro);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* ----------------------------------------------------------
+   6. CATÁLOGO Y DETALLE (ajusta las cards de Bootstrap)
+   ---------------------------------------------------------- */
+
+/* Las imágenes de las tarjetas son cuadradas y se recortan sin deformarse */
+.tarjeta-producto .card-img-top,
+.tarjeta-categoria .card-img-top {
+  object-fit: cover;
+}
+
+.tarjeta-producto .card-img-top {
+  aspect-ratio: 1 / 1;
+}
+
+/* Efecto al pasar el cursor: la tarjeta sube un poco y proyecta sombra */
+.tarjeta-producto,
+.tarjeta-categoria {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-producto:hover,
+.tarjeta-categoria:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0.5rem 1rem rgba(59, 42, 32, 0.2);
+}
+
+/* Detalle de producto: la imagen se adapta al ancho (img-fluid de Bootstrap) y no se deforma */
+.detalle-imagen {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--ac-arena);
+}
+
+.precio-detalle {
+  font-size: 2rem;
+}
+
+/* Botones del índice de categorías del catálogo */
+.nav-pills .nav-link {
+  color: var(--ac-marron);
+  background-color: var(--ac-arena);
+}
+
+.nav-pills .nav-link:hover,
+.nav-pills .nav-link.active {
+  background-color: var(--ac-terracota);
+  color: #FFFFFF;
+}
+
+/* ----------------------------------------------------------
+   7. FORMULARIOS (ajusta los form-control de Bootstrap)
+   Las clases form-control, form-label, form-select y btn vienen
+   de Bootstrap; aquí solo cambiamos colores.
+   ---------------------------------------------------------- */
+.formulario-card {
+  background-color: var(--ac-papel);
+  border-color: var(--ac-arena);
+}
+
+.form-control,
+.form-select {
+  background-color: #FFFFFF;
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: var(--ac-terracota);
+  box-shadow: 0 0 0 0.25rem rgba(196, 98, 63, 0.25);
+}
+
+.form-check-input:checked {
+  background-color: var(--ac-terracota);
+  border-color: var(--ac-terracota);
+}
+
+legend {
+  font-family: var(--ac-fuente-titulos);
+}
+
+/* ----------------------------------------------------------
+   8. PREGUNTAS FRECUENTES (ajusta el accordion de Bootstrap)
+   El funcionamiento (abrir y cerrar) lo da Bootstrap;
+   aquí solo cambiamos los colores.
+   ---------------------------------------------------------- */
+.accordion {
+  --bs-accordion-bg: var(--ac-papel);
+  --bs-accordion-border-color: var(--ac-arena);
+  --bs-accordion-active-bg: var(--ac-arena);
+  --bs-accordion-active-color: var(--ac-marron);
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(196, 98, 63, 0.25);
+}
+
+/* ----------------------------------------------------------
+   9. PANEL DE ADMINISTRACIÓN (propio + tablas de Bootstrap)
+   El menú oscuro distingue el panel del sitio del cliente.
+   ---------------------------------------------------------- */
+/* Se escribe "header .admin-navbar" para que gane sobre "header .navbar" del sitio del cliente */
+header .admin-navbar {
+  background-color: var(--ac-marron);
+  border-bottom: 3px solid var(--ac-terracota);
+}
+
+header .admin-navbar .navbar-brand img {
+  height: 40px;
+  width: auto;
+}
+
+header .admin-navbar .nav-link {
+  color: var(--ac-crema);
+}
+
+header .admin-navbar .nav-link:hover,
+header .admin-navbar .nav-link.active {
+  color: #E9906F;
+}
+
+.admin-footer {
+  color: var(--ac-marron);
+  border-top: 1px solid var(--ac-arena);
+}
+
+/* Indicadores del resumen */
+.tarjeta-indicador {
+  background-color: var(--ac-papel);
+  border-color: var(--ac-arena);
+}
+
+.indicador {
+  font-family: var(--ac-fuente-titulos);
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+/* ----------------------------------------------------------
+   10. DISEÑO MODERNO (propio) - misma paleta, estilo más limpio
+   Va al final para sobrescribir las secciones anteriores.
+   ---------------------------------------------------------- */
+:root {
+  --ac-fuente-titulos: "Plus Jakarta Sans", system-ui, sans-serif;
+  --ac-fuente-texto: "Plus Jakarta Sans", system-ui, sans-serif;
+  --bs-body-font-family: var(--ac-fuente-texto);
+  --ac-radio: 20px;
+  --ac-sombra: 0 1px 2px rgba(59, 42, 32, 0.05), 0 8px 24px rgba(59, 42, 32, 0.06);
+  --ac-sombra-hover: 0 2px 4px rgba(59, 42, 32, 0.06), 0 18px 40px rgba(59, 42, 32, 0.14);
+  --bs-body-bg: #FBF7F1;
+}
+
+body { background: #FBF7F1; -webkit-font-smoothing: antialiased; }
+#root { display: flex; flex-direction: column; min-height: 100vh; }
+#root > main { flex: 1; }
+
+h1, h2, h3, h4 { font-family: var(--ac-fuente-titulos); letter-spacing: -0.02em; }
+h1 { font-weight: 800; }
+h2, h3 { font-weight: 700; }
+.etiqueta {
+  display: inline-block; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ac-terracota-oscuro); background: rgba(196, 98, 63, 0.12); padding: 0.35rem 0.8rem; border-radius: 999px;
+}
+.seccion-titulo { display: flex; justify-content: space-between; align-items: end; margin-bottom: 1.5rem; gap: 1rem; }
+.seccion-titulo h2 { margin: 0; font-size: clamp(1.5rem, 2.5vw, 2rem); }
+.seccion-titulo a { font-weight: 600; text-decoration: none; white-space: nowrap; }
+
+/* Navbar translúcida con desenfoque */
+header { position: sticky; top: 0; z-index: 1030; }
+header .navbar {
+  background: rgba(251, 247, 241, 0.82); backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px); border-bottom: 1px solid rgba(228, 216, 197, 0.7); padding-block: 0.6rem;
+}
+header .navbar-brand img { height: 36px; }
+header .nav-link { font-weight: 600; font-size: 0.95rem; border-radius: 999px; padding: 0.45rem 1rem; margin: 0 0.1rem; transition: background-color 0.15s, color 0.15s; }
+header .navbar-nav .nav-link:hover { background: rgba(59, 42, 32, 0.06); color: var(--ac-marron); }
+header .navbar-nav .nav-link.active,
+header .navbar-nav .nav-link.active:hover { background: var(--ac-marron); color: #fff; }
+header button.nav-link { background: none; border: 0; font-family: inherit; }
+
+/* Botones */
+.btn { border-radius: 999px; font-weight: 600; padding: 0.6rem 1.4rem; transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s; }
+.btn-sm { padding: 0.35rem 0.9rem; }
+.btn-lg { padding: 0.8rem 1.9rem; }
+.btn-primary { box-shadow: 0 6px 16px rgba(196, 98, 63, 0.35); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(196, 98, 63, 0.4); }
+.btn-oscuro { background: transparent; border: 1.5px solid var(--ac-marron); color: var(--ac-marron); }
+.btn-oscuro:hover { background: var(--ac-marron); color: #fff; }
+.btn-outline-secondary { --bs-btn-color: var(--ac-marron); --bs-btn-border-color: var(--ac-arena); --bs-btn-hover-bg: var(--ac-marron); --bs-btn-hover-border-color: var(--ac-marron); }
+
+/* Hero */
+.hero-moderno {
+  position: relative; overflow: hidden; padding: clamp(3rem, 7vw, 6rem) 0;
+  background:
+    radial-gradient(60% 80% at 85% 20%, rgba(196, 98, 63, 0.22), transparent 70%),
+    radial-gradient(50% 70% at 5% 100%, rgba(107, 122, 58, 0.16), transparent 70%),
+    #FBF7F1;
+}
+.hero-moderno h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.05; margin: 1rem 0; }
+.hero-moderno h1 span { color: var(--ac-terracota); }
+.hero-moderno .lead { color: #6a574b; max-width: 32rem; margin-bottom: 1.75rem; }
+.hero-collage { position: relative; height: 380px; }
+.hero-collage img {
+  position: absolute; width: 56%; aspect-ratio: 1; object-fit: cover; background: #fff;
+  border-radius: 24px; box-shadow: var(--ac-sombra-hover); border: 6px solid #fff;
+}
+.hero-collage img:nth-child(1) { top: 0; left: 4%; transform: rotate(-6deg); }
+.hero-collage img:nth-child(2) { top: 18%; right: 0; transform: rotate(5deg); z-index: 2; }
+.hero-collage img:nth-child(3) { bottom: 0; left: 22%; transform: rotate(-2deg); width: 46%; z-index: 3; }
+
+/* Beneficios */
+.beneficio { display: flex; gap: 0.9rem; align-items: center; background: #fff; border-radius: var(--ac-radio); padding: 1rem 1.25rem; box-shadow: var(--ac-sombra); height: 100%; }
+.beneficio-icono { flex: none; width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: rgba(196, 98, 63, 0.12); color: var(--ac-terracota-oscuro); font-size: 1.2rem; }
+.beneficio p { margin: 0; }
+
+/* Categorías: imagen completa con el nombre encima */
+.tarjeta-categoria { position: relative; border: 0 !important; border-radius: var(--ac-radio) !important; overflow: hidden; box-shadow: var(--ac-sombra); background: #fff; }
+.tarjeta-categoria .card-img-top { aspect-ratio: 4 / 5; height: auto; object-fit: cover; transition: transform 0.4s ease; }
+.tarjeta-categoria:hover .card-img-top { transform: scale(1.06); }
+.tarjeta-categoria .card-body {
+  position: absolute; inset: auto 0 0 0; padding: 2.5rem 1rem 0.9rem;
+  background: linear-gradient(transparent, rgba(59, 42, 32, 0.85));
+}
+.tarjeta-categoria .card-title a { color: #fff !important; font-size: 1.05rem; }
+
+/* Productos */
+.tarjeta-producto { border: 0 !important; border-radius: var(--ac-radio) !important; background: #fff; box-shadow: var(--ac-sombra); overflow: hidden; }
+.tarjeta-producto .card-img-top { aspect-ratio: 1; object-fit: cover; background: var(--ac-crema); transition: transform 0.4s ease; }
+.tarjeta-producto:hover .card-img-top { transform: scale(1.04); }
+.tarjeta-producto .card-body { padding: 1rem 1.15rem 1.2rem; display: flex; flex-direction: column; gap: 0.15rem; }
+.tarjeta-producto .categoria { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ac-oliva); }
+.tarjeta-producto .card-title { font-size: 1rem; font-weight: 700; margin: 0; }
+.tarjeta-producto .precio { font-size: 1.1rem; font-weight: 700; color: var(--ac-marron); margin: 0.35rem 0 0; }
+.tarjeta-categoria, .tarjeta-producto { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.tarjeta-categoria:hover, .tarjeta-producto:hover { transform: translateY(-5px); box-shadow: var(--ac-sombra-hover); }
+.precio { color: var(--ac-marron); font-weight: 700; }
+
+/* Chips de filtro y búsqueda */
+.nav-pills .nav-link { border-radius: 999px; font-weight: 600; font-size: 0.9rem; background: #fff; border: 1px solid var(--ac-arena); color: var(--ac-marron); padding: 0.45rem 1.1rem; }
+.nav-pills .nav-link:hover { background: var(--ac-terracota); border-color: var(--ac-terracota); color: #fff; }
+.nav-pills .nav-link.active { background: var(--ac-terracota); border-color: var(--ac-terracota); color: #fff; }
+
+/* Formularios y tarjetas */
+.form-control, .form-select { border-radius: 12px; border: 1.5px solid var(--ac-arena); padding: 0.65rem 0.95rem; background: #fff; }
+.form-control:focus, .form-select:focus { border-color: var(--ac-terracota); box-shadow: 0 0 0 4px rgba(196, 98, 63, 0.15); }
+.input-group > .form-control { border-radius: 12px 0 0 12px; }
+.input-group > .btn { border-radius: 0 12px 12px 0; }
+.formulario-card, .tarjeta-indicador { border: 0 !important; border-radius: var(--ac-radio) !important; background: #fff; box-shadow: var(--ac-sombra); }
+.alert { border: 0; border-radius: 14px; }
+
+/* Detalle, carrito y tablas */
+.detalle-imagen { border: 0; border-radius: 24px; box-shadow: var(--ac-sombra); background: #fff; }
+.precio-detalle { font-size: 2rem; }
+.imagen-carrito { width: 64px; height: 64px; object-fit: cover; border-radius: 12px; border: 0; background: var(--ac-crema); }
+.table { --bs-table-bg: #fff; border-radius: var(--ac-radio); overflow: hidden; box-shadow: var(--ac-sombra); }
+.table > thead th { background: var(--ac-crema); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6a574b; border: 0; }
+.table > :not(caption) > * > * { padding: 0.9rem 1rem; border-color: rgba(228, 216, 197, 0.6); }
+.breadcrumb { --bs-breadcrumb-divider-color: var(--ac-terracota); font-size: 0.9rem; }
+.badge { border-radius: 999px; font-weight: 600; padding: 0.4em 0.8em; }
+
+/* Acordeón */
+.accordion-item { border: 0 !important; border-radius: 16px !important; overflow: hidden; margin-bottom: 0.7rem; box-shadow: var(--ac-sombra); }
+.accordion-button { font-weight: 600; }
+.accordion-button:not(.collapsed) { background: rgba(196, 98, 63, 0.1); color: var(--ac-marron); box-shadow: none; }
+
+/* Pie de página */
+.pie { background: var(--ac-marron); margin-top: 5rem; border-radius: 32px 32px 0 0; }
+.pie h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: 0.08em; color: #fff; }
+.pie a { text-decoration: none; }
+.pie a:hover { color: #E9906F; }
+
+/* Panel de administración */
+header .admin-navbar { background: var(--ac-marron); backdrop-filter: none; border: 0; }
+header .admin-navbar .nav-link { color: var(--ac-crema); }
+header .admin-navbar .nav-link:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+header .admin-navbar .nav-link.active { background: var(--ac-terracota); color: #fff; }
+.tarjeta-indicador { border-left: 5px solid var(--ac-terracota) !important; }
+.indicador { font-weight: 800; color: var(--ac-terracota-oscuro); }
+
+@media (max-width: 991px) {
+  .hero-collage { height: 300px; margin-top: 1rem; }
+  header .navbar-collapse { padding-top: 0.75rem; }
+}
+@media (max-width: 576px) {
+  .seccion-titulo { flex-direction: column; align-items: start; }
+}
+
+/* Tabla del carrito: columnas de ancho fijo para que cambiar un valor no mueva el resto */
+.tabla-carrito { table-layout: fixed; min-width: 760px; font-variant-numeric: tabular-nums; }
+.tabla-carrito td, .tabla-carrito th { overflow-wrap: anywhere; }
+.tabla-carrito .btn { white-space: nowrap; }
+
+/* Carrito en pantallas angostas (bajo 992 px, donde la tabla de 760 px ya no cabe): tarjetas apiladas, sin scroll horizontal */
+@media (max-width: 991px) {
+  .tabla-carrito { min-width: 0; display: block; }
+  .tabla-carrito colgroup, .tabla-carrito thead, .tabla-carrito .carrito-vacio { display: none; }
+  .tabla-carrito tbody, .tabla-carrito tfoot { display: block; }
+  .tabla-carrito tbody tr {
+    display: grid; grid-template-columns: 64px 1fr; gap: 0.35rem 0.9rem;
+    padding: 1rem; border-bottom: 1px solid rgba(228, 216, 197, 0.6);
+  }
+  .tabla-carrito tbody td { display: flex; justify-content: space-between; align-items: center; padding: 0; border: 0; grid-column: 2; }
+  .tabla-carrito tbody td:first-child { grid-column: 1; grid-row: 1 / span 5; align-items: start; }
+  .tabla-carrito tbody td.carrito-nombre { font-weight: 700; }
+  .tabla-carrito tbody td[data-label]::before { content: attr(data-label); color: #6a574b; font-size: 0.85rem; }
+  .tabla-carrito tbody td:last-child { justify-content: flex-end; }
+  .tabla-carrito tfoot tr { display: flex; justify-content: space-between; align-items: center; padding: 1rem; }
+  .tabla-carrito tfoot th { display: block; padding: 0; border: 0; }
+}

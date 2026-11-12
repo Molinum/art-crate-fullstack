@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="48" viewBox="0 0 180 48" role="img" aria-label="Logo de ArtCrate">
+  <rect x="2" y="8" width="32" height="32" rx="4" fill="#C4623F"/>
+  <path d="M2 18h32M18 8v32" stroke="#F6EFE4" stroke-width="3"/>
+  <text x="44" y="33" font-family="Georgia, serif" font-size="24" font-weight="bold" fill="#F6EFE4">ArtCrate</text>
+</svg>

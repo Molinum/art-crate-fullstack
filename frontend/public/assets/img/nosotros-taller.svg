@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500" role="img" aria-label="Nuestro taller">
+  <rect width="800" height="500" fill="#6B7A3A"/>
+  <circle cx="640.0" cy="110.0" r="70.0" fill="#F6EFE4" opacity="0.35"/>
+  <rect x="80.0" y="310.0" width="640.0" height="30.0" rx="6" fill="#F6EFE4" opacity="0.35"/>
+  <text x="50%" y="230.0" text-anchor="middle" font-family="Georgia, serif" font-size="37.5" fill="#FFFFFF">Nuestro taller</text>
+  <text x="50%" y="270.0" text-anchor="middle" font-family="Arial, sans-serif" font-size="22.5" fill="#FFFFFF" opacity="0.85">ArtCrate</text>
+</svg>
