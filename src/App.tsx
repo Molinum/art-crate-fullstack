@@ -4,6 +4,7 @@ import { Layout } from './components/Layout'
 import { Contacto } from './pages/Contacto'
 import { Faq } from './pages/Faq'
 import { Nosotros } from './pages/Nosotros'
+import { NoEncontrada } from './pages/NoEncontrada'
 import { Panel } from './pages/admin/Panel'
 import { PedidosAdmin } from './pages/admin/PedidosAdmin'
 import { ProductoForm } from './pages/admin/ProductoForm'
@@ -30,6 +31,7 @@ function App() {
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/nosotros" element={<Nosotros />} />
         <Route path="/faq" element={<Faq />} />
+        <Route path="*" element={<NoEncontrada />} />
       </Route>
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<Panel />} />
