@@ -2,7 +2,7 @@
 
 Tienda online de insumos de arte. Proyecto del curso Desarrollo Fullstack 2 (Duoc UC).
 
-Es la versión en React + TypeScript del sitio estático original ([ArtCrate](https://github.com/Molinum/ArtCrate)). Consume la API del [backend](https://github.com/Molinum/ArtCrate-backend) a través del gateway.
+Es la versión en React + TypeScript del sitio estático original ([ArtCrate](https://github.com/Molinum/ArtCrate)). Consume la API del [backend](../backend/README.md) a través del gateway.
 
 ## Tecnologías
 
@@ -14,7 +14,7 @@ Es la versión en React + TypeScript del sitio estático original ([ArtCrate](ht
 ## Requisitos
 
 - Node.js 20.19 o superior (o 22.12+)
-- El backend corriendo en `http://localhost:8080` (ver el README del backend: MySQL con Docker, Eureka, los microservicios y el gateway)
+- El backend corriendo en `http://localhost:8080` (ver [`../backend`](../backend/README.md): MySQL con Docker, Eureka, los microservicios y el gateway)
 
 ## Cómo ejecutarlo
 
