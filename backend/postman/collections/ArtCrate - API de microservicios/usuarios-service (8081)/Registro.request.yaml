@@ -1,0 +1,24 @@
+$kind: http-request
+description: Crea un usuario de prueba con correo único y guarda su id en usuarioNuevoId (Obtener, Actualizar y Eliminar usan ese id, así no se borra a Ana).
+url: "{{url}}/api/usuarios/registro"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Usuario",
+      "apellido": "Prueba",
+      "correo": "prueba{{$timestamp}}@correo.cl",
+      "password": "Abcdefg1",
+      "telefono": "+56912345678",
+      "region": "Valparaíso"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      var datos = pm.response.json();
+      pm.collectionVariables.set("usuarioNuevoId", datos.id);
+    language: text/javascript
+order: 1000
