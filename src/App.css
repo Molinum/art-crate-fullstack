@@ -1,0 +1,53 @@
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+label {
+  display: block;
+}
+input,
+select,
+textarea,
+button {
+  font: inherit;
+  padding: 6px 10px;
+  box-sizing: border-box;
+}
+label input {
+  width: 100%;
+  margin-top: 4px;
+}
+.fila {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.fila input {
+  flex: 1;
+}
+textarea {
+  width: 100%;
+  font-family: monospace;
+}
+.atajos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+button {
+  cursor: pointer;
+}
+pre {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 12px;
+  overflow: auto;
+  max-height: 420px;
+}
+.ok {
+  color: #1a7f37;
+}
+.error {
+  color: #c62828;
+}

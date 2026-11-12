@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-label="Conoce ArtCrate">
+  <rect width="960" height="540" fill="#3B2A20"/>
+  <circle cx="768.0" cy="118.8" r="75.60000000000001" fill="#F6EFE4" opacity="0.35"/>
+  <rect x="96.0" y="334.8" width="768.0" height="32.4" rx="6" fill="#F6EFE4" opacity="0.35"/>
+  <text x="50%" y="248.4" text-anchor="middle" font-family="Georgia, serif" font-size="40.5" fill="#FFFFFF">Conoce ArtCrate</text>
+  <text x="50%" y="291.6" text-anchor="middle" font-family="Arial, sans-serif" font-size="24.3" fill="#FFFFFF" opacity="0.85">Video de presentación</text>
+</svg>
