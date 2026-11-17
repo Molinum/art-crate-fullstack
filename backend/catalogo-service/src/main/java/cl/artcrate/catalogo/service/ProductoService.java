@@ -87,6 +87,9 @@ public class ProductoService {
         producto.setDescripcion(datos.descripcion());
         producto.setPrecio(datos.precio());
         producto.setImagenUrl(datos.imagenUrl());
+        producto.setMarca(datos.marca());
+        producto.setFormato(datos.formato());
+        producto.setContenido(datos.contenido());
         producto.setCategoria(categoria);
         // Si "activo" no viene en el request: al crear queda activo y al editar no cambia
         if (datos.activo() != null) {
@@ -107,6 +110,7 @@ public class ProductoService {
 
     private ProductoResponse aRespuesta(Producto p) {
         return new ProductoResponse(p.getId(), p.getSku(), p.getNombre(), p.getDescripcion(), p.getPrecio(),
-                p.getImagenUrl(), p.getCategoria().getId(), p.getCategoria().getNombre(), p.isActivo());
+                p.getImagenUrl(), p.getMarca(), p.getFormato(), p.getContenido(),
+                p.getCategoria().getId(), p.getCategoria().getNombre(), p.isActivo());
     }
 }

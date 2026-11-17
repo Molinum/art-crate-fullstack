@@ -5,17 +5,123 @@ import cl.artcrate.catalogo.model.Producto;
 import cl.artcrate.catalogo.repository.CategoriaRepository;
 import cl.artcrate.catalogo.repository.ProductoRepository;
 import java.util.List;
-import org.springframework.data.domain.Sort;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Sort;
 
 /**
- * Carga 5 categorías y 12 productos al arrancar, solo si las tablas están vacías.
- * Los productos se guardan en orden para que sus ids sean 1..12 (el inventario depende de eso).
+ * Carga 5 categorías y 30 productos al arrancar.
+ * - Si las tablas están vacías, crea todo en orden (los productos quedan con ids 1..30; el inventario depende de eso).
+ * - Si ya había datos, solo agrega los productos que falten (por SKU) y completa la ficha técnica de los que no la tenían.
  */
 @Configuration
 public class DatosIniciales {
+
+    /** Un producto de ejemplo. "categoria" es la posición de la categoría (0 = Pintura ... 4 = Kits). */
+    private record Semilla(String sku, String nombre, String descripcion, long precio, String imagen,
+            int categoria, String marca, String formato, String contenido) {
+    }
+
+    // El orden importa: la posición en la lista es el id del producto (1..30)
+    private static final List<Semilla> PRODUCTOS = List.of(
+            // ----- Pintura -----
+            new Semilla("ART-PIN-001", "Acrílico 12 colores",
+                    "Set de 12 tubos de pintura acrílica de 22 ml, secado rápido y colores intensos.",
+                    12990, "assets/img/producto-01-acrilico-12-colores.svg", 0, "Pigmenta", "Tubos de 22 ml", "12 colores"),
+            new Semilla("ART-PIN-002", "Óleo 6 tubos",
+                    "Seis tubos de pintura al óleo de 20 ml con gran poder cubriente.",
+                    18990, "assets/img/producto-02-oleo-6-tubos.svg", 0, "Pigmenta", "Tubos de 20 ml", "6 colores"),
+            new Semilla("ART-PIN-003", "Acuarela 24 pastillas",
+                    "Caja metálica de acuarela profesional con 24 pastillas y pincel.",
+                    24990, "assets/img/producto-03-acuarela-24-pastillas.svg", 0, "Atelier Sur", "Caja metálica", "24 pastillas y 1 pincel"),
+            // ----- Dibujo -----
+            new Semilla("ART-DIB-001", "Lápices grafito x12",
+                    "Set de 12 lápices de grafito de distintas durezas (de 6B a 4H).",
+                    7990, "assets/img/producto-04-lapices-grafito-12.svg", 1, "Trazo Fino", "Estuche de cartón", "12 lápices (6B a 4H)"),
+            new Semilla("ART-DIB-002", "Carboncillo y difuminos",
+                    "Barras de carboncillo natural con difuminos de papel para sombreado.",
+                    5990, "assets/img/producto-05-carboncillo-difuminos.svg", 1, "Trazo Fino", "Caja de cartón", "Barras de carboncillo y difuminos de papel"),
+            new Semilla("ART-DIB-003", "Marcadores x24",
+                    "Estuche de 24 marcadores de doble punta, fina y gruesa.",
+                    16990, "assets/img/producto-06-marcadores-24.svg", 1, "Colorín", "Estuche, doble punta", "24 marcadores"),
+            // ----- Papeles y lienzos -----
+            new Semilla("ART-PAP-001", "Lienzo 40x50 cm",
+                    "Lienzo de algodón imprimado de 40 por 50 centímetros, listo para pintar.",
+                    8990, "assets/img/producto-07-lienzo-40x50.svg", 2, "Lienzo Sur", "40 x 50 cm", "1 lienzo"),
+            new Semilla("ART-PAP-002", "Block acuarela A4",
+                    "Block de 20 hojas de papel para acuarela de 300 gramos, tamaño A4.",
+                    9990, "assets/img/producto-08-block-acuarela-a4.svg", 2, "Boceto", "A4, 300 g", "20 hojas"),
+            new Semilla("ART-PAP-003", "Cuaderno de bocetos A5",
+                    "Cuaderno de bocetos de tapa dura, 80 hojas, tamaño A5.",
+                    6490, "assets/img/producto-09-cuaderno-bocetos-a5.svg", 2, "Boceto", "A5, tapa dura", "80 hojas"),
+            // ----- Pinceles y accesorios -----
+            new Semilla("ART-ACC-001", "Set de 5 pinceles",
+                    "Cinco pinceles sintéticos de distintas formas y tamaños.",
+                    7490, "assets/img/producto-10-set-pinceles-5.svg", 3, "Atelier Sur", "Pinceles sintéticos", "5 pinceles"),
+            new Semilla("ART-ACC-002", "Caballete de mesa",
+                    "Caballete de mesa de madera plegable, ideal para espacios pequeños.",
+                    21990, "assets/img/producto-11-caballete-mesa.svg", 3, "Lienzo Sur", "Madera plegable", "1 caballete"),
+            // ----- Kits -----
+            new Semilla("ART-KIT-001", "Kit Iniciación Acrílico",
+                    "Kit ArtCrate con pinturas acrílicas, pinceles, lienzo y paleta para empezar.",
+                    29990, "assets/img/producto-12-kit-iniciacion-acrilico.svg", 4, "ArtCrate", "Caja kit", "Pinturas acrílicas, pinceles, lienzo y paleta"),
+
+            // ===== Productos nuevos (13 al 30) =====
+            new Semilla("ART-PIN-004", "Acrílico metálico x6",
+                    "Set de 6 acrílicos con acabado metálico, ideal para detalles y decoración.",
+                    14990, "assets/img/producto-13-acrilico-metalico-x6.svg", 0, "Pigmenta", "Tubos de 22 ml", "6 colores metálicos"),
+            new Semilla("ART-PIN-005", "Gouache 12 colores",
+                    "Témpera gouache opaca de secado mate, ideal para ilustración y diseño.",
+                    15990, "assets/img/producto-14-gouache-12-colores.svg", 0, "Atelier Sur", "Tubos de 15 ml", "12 colores"),
+            new Semilla("ART-PIN-006", "Acuarela líquida x8",
+                    "Ocho frascos de acuarela líquida de alta intensidad, con gotario.",
+                    13490, "assets/img/producto-15-acuarela-liquida-x8.svg", 0, "Colorín", "Frascos de 30 ml", "8 colores"),
+            new Semilla("ART-PIN-007", "Barniz acrílico brillante",
+                    "Barniz protector de acabado brillante para obras en acrílico y óleo.",
+                    8490, "assets/img/producto-16-barniz-acrilico-brillante.svg", 0, "Pigmenta", "Botella de 250 ml", "1 botella"),
+            new Semilla("ART-DIB-004", "Lápices de colores x24",
+                    "Estuche de 24 lápices de colores de mina blanda y pigmentos vivos.",
+                    9990, "assets/img/producto-17-lapices-colores-24.svg", 1, "Trazo Fino", "Estuche metálico", "24 lápices"),
+            new Semilla("ART-DIB-005", "Pastel seco x24",
+                    "Barras de pastel seco suave para trabajos de gran intensidad de color.",
+                    14490, "assets/img/producto-18-pastel-seco-x24.svg", 1, "Atelier Sur", "Caja de cartón", "24 barras"),
+            new Semilla("ART-DIB-006", "Portaminas técnico 0.5",
+                    "Portaminas de metal con grip antideslizante y minas de repuesto.",
+                    5490, "assets/img/producto-19-portaminas-tecnico.svg", 1, "Trazo Fino", "Portaminas de 0,5 mm", "1 portaminas y 3 tubos de minas"),
+            new Semilla("ART-DIB-007", "Tintas chinas x6",
+                    "Seis tintas chinas, negras y de color, con cuentagotas para línea y lavado.",
+                    11990, "assets/img/producto-20-tintas-chinas-x6.svg", 1, "Colorín", "Frascos de 20 ml", "6 frascos"),
+            new Semilla("ART-PAP-004", "Lienzo 30x40 cm",
+                    "Lienzo de algodón imprimado de 30 por 40 centímetros, listo para pintar.",
+                    6990, "assets/img/producto-21-lienzo-30x40.svg", 2, "Lienzo Sur", "30 x 40 cm", "1 lienzo"),
+            new Semilla("ART-PAP-005", "Lienzo 50x70 cm",
+                    "Lienzo de algodón imprimado de 50 por 70 centímetros para obras de mayor tamaño.",
+                    12490, "assets/img/producto-22-lienzo-50x70.svg", 2, "Lienzo Sur", "50 x 70 cm", "1 lienzo"),
+            new Semilla("ART-PAP-006", "Block de dibujo A3",
+                    "Block de 30 hojas de papel de 160 gramos para técnicas secas.",
+                    8990, "assets/img/producto-23-block-dibujo-a3.svg", 2, "Boceto", "A3 (297 x 420 mm)", "30 hojas de 160 g"),
+            new Semilla("ART-PAP-007", "Papel kraft en rollo",
+                    "Rollo de papel kraft para bocetos grandes, collage y embalaje creativo.",
+                    5990, "assets/img/producto-24-papel-kraft-rollo.svg", 2, "Boceto", "Rollo de 5 m x 60 cm", "1 rollo"),
+            new Semilla("ART-ACC-003", "Paleta de mezcla",
+                    "Paleta ovalada de plástico rígido con pocillo para mezclar colores.",
+                    3990, "assets/img/producto-25-paleta-de-mezcla.svg", 3, "Atelier Sur", "Paleta de 30 cm", "1 paleta"),
+            new Semilla("ART-ACC-004", "Espátulas x5",
+                    "Cinco espátulas de acero inoxidable con mango de madera para óleo y acrílico.",
+                    9490, "assets/img/producto-26-espatulas-x5.svg", 3, "Atelier Sur", "Acero y madera", "5 espátulas"),
+            new Semilla("ART-ACC-005", "Atril de pie plegable",
+                    "Atril de pino de pie, regulable en altura y plegable.",
+                    34990, "assets/img/producto-27-atril-de-pie.svg", 3, "Lienzo Sur", "Altura regulable hasta 170 cm", "1 atril"),
+            new Semilla("ART-KIT-002", "Kit Acuarela Viajero",
+                    "Kit portátil con acuarelas, pinceles, block y paleta para pintar en cualquier lugar.",
+                    27990, "assets/img/producto-28-kit-acuarela-viajero.svg", 4, "ArtCrate", "Estuche de viaje", "12 pastillas, 2 pinceles y block A5"),
+            new Semilla("ART-KIT-003", "Kit Dibujo Profesional",
+                    "Kit con lápices de grafito, carboncillo, difuminos y cuaderno de bocetos.",
+                    32990, "assets/img/producto-29-kit-dibujo-profesional.svg", 4, "ArtCrate", "Caja de madera", "12 lápices, carboncillo, difuminos y cuaderno A5"),
+            new Semilla("ART-KIT-004", "Kit Óleo Principiante",
+                    "Kit con tubos de óleo, pinceles, lienzo y medium para dar los primeros pasos.",
+                    36990, "assets/img/producto-30-kit-oleo-principiante.svg", 4, "ArtCrate", "Caja de madera", "6 tubos, 3 pinceles, lienzo 30x40 y medium"));
 
     @Bean
     CommandLineRunner cargarCatalogo(CategoriaRepository categorias, ProductoRepository productos) {
@@ -28,50 +134,18 @@ public class DatosIniciales {
                 categorias.save(categoria("Kits ArtCrate", "Kits listos para empezar a crear"));
             }
 
-            if (productos.count() == 0) {
-                List<Categoria> cats = categorias.findAll(Sort.by("id")); // en orden: 1..5
-                Categoria pintura = cats.get(0);
-                Categoria dibujo = cats.get(1);
-                Categoria papeles = cats.get(2);
-                Categoria pinceles = cats.get(3);
-                Categoria kits = cats.get(4);
-
-                productos.save(producto("ART-PIN-001", "Acrílico 12 colores",
-                        "Set de 12 tubos de pintura acrílica de 22 ml, secado rápido y colores intensos.",
-                        12990, "assets/img/producto-01-acrilico-12-colores.svg", pintura));
-                productos.save(producto("ART-PIN-002", "Óleo 6 tubos",
-                        "Seis tubos de pintura al óleo de 20 ml con gran poder cubriente.",
-                        18990, "assets/img/producto-02-oleo-6-tubos.svg", pintura));
-                productos.save(producto("ART-PIN-003", "Acuarela 24 pastillas",
-                        "Caja metálica de acuarela profesional con 24 pastillas y pincel.",
-                        24990, "assets/img/producto-03-acuarela-24-pastillas.svg", pintura));
-                productos.save(producto("ART-DIB-001", "Lápices grafito x12",
-                        "Set de 12 lápices de grafito de distintas durezas (de 6B a 4H).",
-                        7990, "assets/img/producto-04-lapices-grafito-12.svg", dibujo));
-                productos.save(producto("ART-DIB-002", "Carboncillo y difuminos",
-                        "Barras de carboncillo natural con difuminos de papel para sombreado.",
-                        5990, "assets/img/producto-05-carboncillo-difuminos.svg", dibujo));
-                productos.save(producto("ART-DIB-003", "Marcadores x24",
-                        "Estuche de 24 marcadores de doble punta, fina y gruesa.",
-                        16990, "assets/img/producto-06-marcadores-24.svg", dibujo));
-                productos.save(producto("ART-PAP-001", "Lienzo 40x50 cm",
-                        "Lienzo de algodón imprimado de 40 por 50 centímetros, listo para pintar.",
-                        8990, "assets/img/producto-07-lienzo-40x50.svg", papeles));
-                productos.save(producto("ART-PAP-002", "Block acuarela A4",
-                        "Block de 20 hojas de papel para acuarela de 300 gramos, tamaño A4.",
-                        9990, "assets/img/producto-08-block-acuarela-a4.svg", papeles));
-                productos.save(producto("ART-PAP-003", "Cuaderno de bocetos A5",
-                        "Cuaderno de bocetos de tapa dura, 80 hojas, tamaño A5.",
-                        6490, "assets/img/producto-09-cuaderno-bocetos-a5.svg", papeles));
-                productos.save(producto("ART-ACC-001", "Set de 5 pinceles",
-                        "Cinco pinceles sintéticos de distintas formas y tamaños.",
-                        7490, "assets/img/producto-10-set-pinceles-5.svg", pinceles));
-                productos.save(producto("ART-ACC-002", "Caballete de mesa",
-                        "Caballete de mesa de madera plegable, ideal para espacios pequeños.",
-                        21990, "assets/img/producto-11-caballete-mesa.svg", pinceles));
-                productos.save(producto("ART-KIT-001", "Kit Iniciación Acrílico",
-                        "Kit ArtCrate con pinturas acrílicas, pinceles, lienzo y paleta para empezar.",
-                        29990, "assets/img/producto-12-kit-iniciacion-acrilico.svg", kits));
+            List<Categoria> cats = categorias.findAll(Sort.by("id")); // en orden: 1..5
+            for (Semilla s : PRODUCTOS) {
+                Producto existente = productos.findBySku(s.sku()).orElse(null);
+                if (existente == null) {
+                    productos.save(producto(s, cats.get(s.categoria())));
+                } else if (existente.getMarca() == null) {
+                    // producto de una versión anterior: se le agrega la ficha técnica
+                    existente.setMarca(s.marca());
+                    existente.setFormato(s.formato());
+                    existente.setContenido(s.contenido());
+                    productos.save(existente);
+                }
             }
         };
     }
@@ -83,14 +157,16 @@ public class DatosIniciales {
         return c;
     }
 
-    private Producto producto(String sku, String nombre, String descripcion, long precio, String imagenUrl,
-            Categoria categoria) {
+    private Producto producto(Semilla s, Categoria categoria) {
         Producto p = new Producto();
-        p.setSku(sku);
-        p.setNombre(nombre);
-        p.setDescripcion(descripcion);
-        p.setPrecio(precio);
-        p.setImagenUrl(imagenUrl);
+        p.setSku(s.sku());
+        p.setNombre(s.nombre());
+        p.setDescripcion(s.descripcion());
+        p.setPrecio(s.precio());
+        p.setImagenUrl(s.imagen());
+        p.setMarca(s.marca());
+        p.setFormato(s.formato());
+        p.setContenido(s.contenido());
         p.setCategoria(categoria);
         p.setActivo(true);
         return p;

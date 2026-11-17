@@ -33,6 +33,11 @@ public class Producto {
 
     private String imagenUrl;
 
+    // Ficha técnica (opcionales)
+    private String marca;
+    private String formato;
+    private String contenido;
+
     // Muchos productos pertenecen a una categoría
     @ManyToOne(optional = false)
     @JoinColumn(name = "categoria_id")
@@ -58,6 +63,15 @@ public class Producto {
 
     public String getImagenUrl() { return imagenUrl; }
     public void setImagenUrl(String imagenUrl) { this.imagenUrl = imagenUrl; }
+
+    public String getMarca() { return marca; }
+    public void setMarca(String marca) { this.marca = marca; }
+
+    public String getFormato() { return formato; }
+    public void setFormato(String formato) { this.formato = formato; }
+
+    public String getContenido() { return contenido; }
+    public void setContenido(String contenido) { this.contenido = contenido; }
 
     public Categoria getCategoria() { return categoria; }
     public void setCategoria(Categoria categoria) { this.categoria = categoria; }

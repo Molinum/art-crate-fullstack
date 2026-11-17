@@ -39,6 +39,9 @@ classDiagram
             String descripcion
             long precio
             String imagenUrl
+            String marca
+            String formato
+            String contenido
             boolean activo
         }
     }
