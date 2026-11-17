@@ -10,9 +10,20 @@ export function Catalogo() {
   const categoriaId = Number(params.get('categoria')) || undefined
   const q = params.get('q') ?? ''
   const [texto, setTexto] = useState(q)
+  const [orden, setOrden] = useState('')
 
   const categorias = useApi(catalogoApi.categorias, [])
   const productos = useApi(() => catalogoApi.productos(categoriaId, q || undefined), [categoriaId, q])
+
+  // la tienda solo muestra productos activos; el orden se aplica en el navegador
+  const lista = (productos.datos ?? [])
+    .filter((p) => p.activo)
+    .sort((a, b) =>
+      orden === 'precio-asc' ? a.precio - b.precio
+      : orden === 'precio-desc' ? b.precio - a.precio
+      : orden === 'nombre' ? a.nombre.localeCompare(b.nombre, 'es')
+      : 0,
+    )
 
   function elegir(id?: number) {
     const nuevo = new URLSearchParams(params)
@@ -47,7 +58,7 @@ export function Catalogo() {
         ))}
       </ul>
 
-      <form className="d-flex gap-2 mb-4" onSubmit={buscar}>
+      <form className="d-flex flex-wrap gap-2 mb-4" onSubmit={buscar}>
         <input
           className="form-control"
           type="search"
@@ -56,13 +67,20 @@ export function Catalogo() {
           onChange={(e) => setTexto(e.target.value)}
         />
         <button className="btn btn-primary" type="submit">Buscar</button>
+        <select className="form-select w-auto" aria-label="Ordenar productos" value={orden} onChange={(e) => setOrden(e.target.value)}>
+          <option value="">Orden predeterminado</option>
+          <option value="precio-asc">Precio: menor a mayor</option>
+          <option value="precio-desc">Precio: mayor a menor</option>
+          <option value="nombre">Nombre (A-Z)</option>
+        </select>
       </form>
 
       {productos.cargando && <Cargando />}
       {productos.error && <ErrorApi mensaje={productos.error} />}
-      {productos.datos?.length === 0 && <p>No hay productos que coincidan.</p>}
+      {productos.datos && <p className="text-secondary small">{lista.length} {lista.length === 1 ? 'producto' : 'productos'}</p>}
+      {productos.datos && lista.length === 0 && <p>No hay productos que coincidan.</p>}
       <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
-        {productos.datos?.map((p) => <TarjetaProducto key={p.id} producto={p} />)}
+        {lista.map((p) => <TarjetaProducto key={p.id} producto={p} />)}
       </div>
     </div>
   )

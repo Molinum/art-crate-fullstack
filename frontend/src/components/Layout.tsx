@@ -1,8 +1,10 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useCarrito } from '../context/CarritoContext'
 import { useSesion } from '../context/SesionContext'
 
 export function Layout() {
   const { usuario, cerrar } = useSesion()
+  const { cantidad } = useCarrito()
   const navegar = useNavigate()
 
   return (
@@ -27,7 +29,12 @@ export function Layout() {
                 <li className="nav-item"><NavLink className="nav-link" to="/" end>Inicio</NavLink></li>
                 <li className="nav-item"><NavLink className="nav-link" to="/catalogo">Catálogo</NavLink></li>
                 <li className="nav-item"><NavLink className="nav-link" to="/contacto">Contacto</NavLink></li>
-                <li className="nav-item"><NavLink className="nav-link" to="/carrito">Carrito</NavLink></li>
+                <li className="nav-item"><NavLink className="nav-link" to="/carrito">
+                  Carrito
+                  {cantidad > 0 && (
+                    <span className="badge rounded-pill text-bg-primary ms-1 contador-carrito" aria-label={`${cantidad} productos en el carrito`}>{cantidad}</span>
+                  )}
+                </NavLink></li>
                 {usuario ? (
                   <>
                     <li className="nav-item"><NavLink className="nav-link" to="/pedidos">Mis pedidos</NavLink></li>

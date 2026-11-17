@@ -446,3 +446,12 @@ header .admin-navbar .nav-link.active { background: var(--ac-terracota); color: 
   .tabla-carrito tfoot tr { display: flex; justify-content: space-between; align-items: center; padding: 1rem; }
   .tabla-carrito tfoot th { display: block; padding: 0; border: 0; }
 }
+
+/* Ficha técnica del detalle de producto */
+.ficha-tecnica { --bs-table-bg: transparent; box-shadow: none; border-radius: 0; }
+.ficha-tecnica th { width: 9rem; font-weight: 600; color: #6a574b; }
+.ficha-tecnica th, .ficha-tecnica td { padding-inline: 0; }
+
+/* Contador del carrito en el navbar */
+.contador-carrito { font-size: 0.7rem; vertical-align: text-top; }
+header .navbar-nav .nav-link.active .contador-carrito { background-color: var(--ac-terracota) !important; }

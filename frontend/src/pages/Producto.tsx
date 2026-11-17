@@ -1,16 +1,22 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Cargando, ErrorApi } from '../components/Estado'
+import { useCarrito } from '../context/CarritoContext'
 import { useSesion } from '../context/SesionContext'
 import { useApi } from '../hooks'
-import { carritoApi, catalogoApi, precioCLP, urlImagen } from '../services/artcrate.service'
+import { carritoApi, catalogoApi, inventarioApi, precioCLP, unidadesCarrito, urlImagen } from '../services/artcrate.service'
 
 export function Producto() {
   const { id } = useParams()
   const navegar = useNavigate()
   const { usuario } = useSesion()
+  const { fijarCantidad } = useCarrito()
   const { datos: p, cargando, error } = useApi(() => catalogoApi.producto(Number(id)), [id])
-  const [cantidad, setCantidad] = useState(1)
+  const stock = useApi(() => inventarioApi.deProducto(Number(id)), [id])
+  const disponibles = stock.datos?.cantidad // undefined mientras carga o si falla
+  // lo escrito en el campo se guarda como texto para poder borrarlo mientras se escribe; la cantidad real se corrige al enviar
+  const [textoCantidad, setTextoCantidad] = useState('1')
+  const cantidad = Math.min(Math.max(1, Math.floor(Number(textoCantidad)) || 1), disponibles || Infinity)
   const [mensaje, setMensaje] = useState<string | null>(null)
   const [errorAgregar, setErrorAgregar] = useState<string | null>(null)
 
@@ -19,7 +25,7 @@ export function Producto() {
     setMensaje(null)
     setErrorAgregar(null)
     try {
-      await carritoApi.agregar(usuario.id, Number(id), cantidad)
+      fijarCantidad(unidadesCarrito(await carritoApi.agregar(usuario.id, Number(id), cantidad)))
       setMensaje('Producto agregado al carrito')
     } catch (e) {
       setErrorAgregar((e as Error).message)
@@ -47,6 +53,36 @@ export function Producto() {
           <p className="precio precio-detalle">{precioCLP(p.precio)}</p>
           <p>{p.descripcion}</p>
 
+          <h2 className="h5 mt-4">Ficha técnica</h2>
+          <table className="table table-sm mb-4 ficha-tecnica">
+            <tbody>
+              {[
+                ['Marca', p.marca],
+                ['Formato', p.formato],
+                ['Contenido', p.contenido],
+                ['Categoría', p.categoriaNombre],
+                ['SKU', p.sku],
+              ].map(([nombre, valor]) => valor && (
+                <tr key={nombre}>
+                  <th scope="row">{nombre}</th>
+                  <td>{valor}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {disponibles !== undefined && (
+            <p className="mb-3">
+              {!p.activo || disponibles === 0 ? (
+                <span className="badge text-bg-secondary">No disponible</span>
+              ) : disponibles <= 5 ? (
+                <span className="badge text-bg-warning">¡Quedan {disponibles} unidades!</span>
+              ) : (
+                <span className="badge text-bg-success">Disponible</span>
+              )}
+            </p>
+          )}
+
           <div className="d-flex flex-wrap gap-2 align-items-center mb-3">
             <label htmlFor="cantidad" className="form-label mb-0">Cantidad</label>
             <input
@@ -55,10 +91,12 @@ export function Producto() {
               style={{ width: 90 }}
               type="number"
               min={1}
-              value={cantidad}
-              onChange={(e) => setCantidad(Math.max(1, Number(e.target.value)))}
+              max={disponibles || undefined}
+              value={textoCantidad}
+              onChange={(e) => setTextoCantidad(e.target.value)}
+              onBlur={() => setTextoCantidad(String(cantidad))}
             />
-            <button className="btn btn-primary text-nowrap" onClick={agregar}>Agregar al carrito</button>
+            <button className="btn btn-primary text-nowrap" onClick={agregar} disabled={!p.activo || disponibles === 0}>Agregar al carrito</button>
           </div>
           {mensaje && (
             <div className="alert alert-success">

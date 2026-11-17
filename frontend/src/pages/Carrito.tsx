@@ -1,13 +1,18 @@
 import { useState } from 'react'
 import type { Carrito as CarritoDatos } from '../types'
 import { Link, useNavigate } from 'react-router-dom'
+import { Campo } from '../components/Campo'
 import { Cargando, ErrorApi } from '../components/Estado'
+import { SelectorRegionComuna } from '../components/SelectorRegionComuna'
+import { useCarrito } from '../context/CarritoContext'
 import { useSesion } from '../context/SesionContext'
+import { REGIONES, comunasDe } from '../data/chile'
 import { useApi } from '../hooks'
-import { carritoApi, pedidosApi, precioCLP, urlImagen } from '../services/artcrate.service'
+import { carritoApi, pedidosApi, precioCLP, unidadesCarrito, urlImagen } from '../services/artcrate.service'
 
 export function Carrito() {
   const { usuario } = useSesion()
+  const { fijarCantidad } = useCarrito()
   const navegar = useNavigate()
   const { datos: inicial, cargando, error } = useApi(
     () => (usuario ? carritoApi.ver(usuario.id) : Promise.resolve(null)),
@@ -18,7 +23,17 @@ export function Carrito() {
   const carrito = actualizado ?? inicial
   const [pendiente, setPendiente] = useState<number | null>(null) // producto en proceso de cambio
   const [errorAccion, setErrorAccion] = useState<string | null>(null)
-  const [dir, setDir] = useState({ direccionDespacho: '', comuna: '', region: '' })
+  // los datos de despacho se prellenan con la región y comuna del usuario, si coinciden con las listas
+  const regionInicial = REGIONES.some((r) => r.nombre === usuario?.region) ? usuario!.region! : ''
+  const comunaInicial = comunasDe(regionInicial).includes(usuario?.comuna ?? '') ? usuario!.comuna! : ''
+  const [dir, setDir] = useState({ direccionDespacho: '', region: regionInicial, comuna: comunaInicial })
+  const [intentado, setIntentado] = useState(false)
+  const [creando, setCreando] = useState(false)
+  const erroresDir = {
+    direccionDespacho: dir.direccionDespacho.trim().length < 5 ? 'Ingresa la dirección de despacho (calle y número)' : undefined,
+    region: dir.region ? undefined : 'Selecciona la región',
+    comuna: dir.region && !dir.comuna ? 'Selecciona la comuna' : undefined,
+  }
 
   if (!usuario) {
     return <div className="container py-5"><p>Para ver tu carrito, <Link to="/login">ingresa a tu cuenta</Link>.</p></div>
@@ -29,7 +44,9 @@ export function Carrito() {
     setErrorAccion(null)
     setPendiente(productoId)
     try {
-      setActualizado(await carritoApi.cambiarCantidad(usuario!.id, productoId, cantidad))
+      const nuevo = await carritoApi.cambiarCantidad(usuario!.id, productoId, cantidad)
+      setActualizado(nuevo)
+      fijarCantidad(unidadesCarrito(nuevo))
     } catch (e) {
       setErrorAccion((e as Error).message)
     } finally {
@@ -43,6 +60,7 @@ export function Carrito() {
       await carritoApi.quitar(usuario!.id, productoId)
       const items = carrito!.items.filter((i) => i.productoId !== productoId)
       setActualizado({ ...carrito!, items, total: items.reduce((t, i) => t + i.subtotal, 0) })
+      fijarCantidad(items.reduce((t, i) => t + i.cantidad, 0))
     } catch (e) {
       setErrorAccion((e as Error).message)
     }
@@ -53,6 +71,7 @@ export function Carrito() {
     try {
       await carritoApi.vaciar(usuario!.id)
       setActualizado({ ...carrito!, items: [], total: 0 })
+      fijarCantidad(0)
     } catch (e) {
       setErrorAccion((e as Error).message)
     }
@@ -60,12 +79,17 @@ export function Carrito() {
 
   async function comprar(e: React.FormEvent) {
     e.preventDefault()
+    setIntentado(true)
+    if (erroresDir.direccionDespacho || erroresDir.region || erroresDir.comuna) return
     setErrorAccion(null)
+    setCreando(true)
     try {
       await pedidosApi.crear({ usuarioId: usuario!.id, ...dir })
+      fijarCantidad(0) // el backend vacía el carrito al crear el pedido
       navegar('/pedidos')
     } catch (err) {
       setErrorAccion((err as Error).message)
+      setCreando(false)
     }
   }
 
@@ -136,23 +160,26 @@ export function Carrito() {
             Vaciar carrito
           </button>
 
-          <form className="card formulario-card p-4" onSubmit={comprar}>
+          <form className="card formulario-card p-4" onSubmit={comprar} noValidate>
             <h2 className="h4">Datos de despacho</h2>
             <div className="row g-3">
-              <div className="col-12">
-                <input className="form-control" placeholder="Dirección" required value={dir.direccionDespacho}
+              <Campo id="despacho-direccion" etiqueta="Dirección" error={intentado ? erroresDir.direccionDespacho : undefined} className="col-12">
+                <input id="despacho-direccion" className={`form-control ${intentado && erroresDir.direccionDespacho ? 'is-invalid' : ''}`}
+                  autoComplete="street-address" placeholder="Calle y número" value={dir.direccionDespacho}
                   onChange={(e) => setDir({ ...dir, direccionDespacho: e.target.value })} />
-              </div>
-              <div className="col-md-6">
-                <input className="form-control" placeholder="Comuna" required value={dir.comuna}
-                  onChange={(e) => setDir({ ...dir, comuna: e.target.value })} />
-              </div>
-              <div className="col-md-6">
-                <input className="form-control" placeholder="Región" required value={dir.region}
-                  onChange={(e) => setDir({ ...dir, region: e.target.value })} />
-              </div>
+              </Campo>
+              <SelectorRegionComuna
+                idBase="despacho"
+                region={dir.region}
+                comuna={dir.comuna}
+                onChange={(region, comuna) => setDir({ ...dir, region, comuna })}
+                errorRegion={intentado ? erroresDir.region : undefined}
+                errorComuna={intentado ? erroresDir.comuna : undefined}
+              />
             </div>
-            <button className="btn btn-primary mt-3 align-self-start" type="submit">Crear pedido</button>
+            <button className="btn btn-primary mt-3 align-self-start" type="submit" disabled={creando}>
+              {creando ? 'Creando pedido...' : 'Crear pedido'}
+            </button>
           </form>
         </>
       )}

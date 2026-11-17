@@ -93,7 +93,7 @@ export function Inicio() {
         {productos.cargando && <Cargando />}
         {productos.error && <ErrorApi mensaje={productos.error} />}
         <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
-          {productos.datos?.slice(0, 4).map((p) => <TarjetaProducto key={p.id} producto={p} />)}
+          {productos.datos?.filter((p) => p.activo).slice(0, 4).map((p) => <TarjetaProducto key={p.id} producto={p} />)}
         </div>
       </section>
     </>

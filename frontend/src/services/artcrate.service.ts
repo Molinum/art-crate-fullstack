@@ -55,6 +55,7 @@ export const catalogoApi = {
 
 export const inventarioApi = {
   todos: () => pedir<Stock[]>('/api/inventario'),
+  deProducto: (productoId: number) => pedir<Stock>(`/api/inventario/${productoId}`),
   fijar: (productoId: number, cantidad: number) => pedir<Stock>(`/api/inventario/${productoId}`, 'PUT', { cantidad }),
 }
 
@@ -92,3 +93,6 @@ export const pagosApi = {
 export const urlImagen = (imagenUrl: string) => '/' + imagenUrl.replace(/^\//, '')
 
 export const precioCLP = (n: number) => '$' + n.toLocaleString('es-CL')
+
+// Unidades totales de un carrito (suma de las cantidades de cada producto)
+export const unidadesCarrito = (c: Carrito) => c.items.reduce((total, i) => total + i.cantidad, 0)

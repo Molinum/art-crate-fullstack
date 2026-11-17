@@ -13,6 +13,9 @@ export interface Producto {
   descripcion: string
   precio: number
   imagenUrl: string
+  marca: string | null
+  formato: string | null
+  contenido: string | null
   categoriaId: number
   categoriaNombre: string
   activo: boolean
@@ -29,6 +32,7 @@ export interface Usuario {
   region: string | null
   rol: Rol
   activo: boolean
+  comuna?: string | null // el backend no la guarda; se conserva en el navegador para prellenar el despacho
 }
 
 export interface RegistroRequest {
@@ -103,6 +107,9 @@ export interface ProductoRequest {
   descripcion: string
   precio: number
   imagenUrl: string
+  marca: string
+  formato: string
+  contenido: string
   categoriaId: number
   activo: boolean
 }
