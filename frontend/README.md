@@ -46,9 +46,11 @@ Es una SPA: si se publica el resultado de `npm run build`, el servidor tiene que
 | `/producto/:id` | Detalle y botón para agregar al carrito |
 | `/login`, `/registro` | Inicio de sesión y creación de cuenta |
 | `/carrito` | Carrito, cambio de cantidades y datos de despacho para crear el pedido |
-| `/pedidos` | Pedidos del usuario y pago |
+| `/pedidos`, `/pedidos/:id` | Lista de pedidos del usuario y su detalle: seguimiento, productos, despacho, pago y cancelación |
 | `/contacto`, `/nosotros`, `/faq` | Páginas informativas |
-| `/admin` | Panel de administración (solo rol ADMIN): productos, stock y pedidos |
+| `/admin` | Panel de administración (solo rol ADMIN): ventas, pedidos por enviar, stock bajo, últimos pedidos, más vendidos y ventas por categoría |
+| `/admin/productos` | Productos con filtros, edición y activar o desactivar. Los productos no se eliminan, para conservar el historial de pedidos |
+| `/admin/pedidos`, `/admin/pedidos/:id` | Lista de pedidos filtrable por estado y detalle con cliente, pago y cambio de estado |
 
 ## Estructura
 

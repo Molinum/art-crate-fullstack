@@ -6,6 +6,7 @@ import { Faq } from './pages/Faq'
 import { Nosotros } from './pages/Nosotros'
 import { NoEncontrada } from './pages/NoEncontrada'
 import { Panel } from './pages/admin/Panel'
+import { PedidoAdmin } from './pages/admin/PedidoAdmin'
 import { PedidosAdmin } from './pages/admin/PedidosAdmin'
 import { ProductoForm } from './pages/admin/ProductoForm'
 import { Productos } from './pages/admin/Productos'
@@ -13,6 +14,7 @@ import { Carrito } from './pages/Carrito'
 import { Catalogo } from './pages/Catalogo'
 import { Inicio } from './pages/Inicio'
 import { Login } from './pages/Login'
+import { PedidoDetalle } from './pages/PedidoDetalle'
 import { Pedidos } from './pages/Pedidos'
 import { Producto } from './pages/Producto'
 import { Registro } from './pages/Registro'
@@ -28,6 +30,7 @@ function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/carrito" element={<Carrito />} />
         <Route path="/pedidos" element={<Pedidos />} />
+        <Route path="/pedidos/:id" element={<PedidoDetalle />} />
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/nosotros" element={<Nosotros />} />
         <Route path="/faq" element={<Faq />} />
@@ -39,6 +42,7 @@ function App() {
         <Route path="productos/nuevo" element={<ProductoForm />} />
         <Route path="productos/:id" element={<ProductoForm />} />
         <Route path="pedidos" element={<PedidosAdmin />} />
+        <Route path="pedidos/:id" element={<PedidoAdmin />} />
       </Route>
     </Routes>
   )

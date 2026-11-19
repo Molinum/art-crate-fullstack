@@ -1,50 +1,59 @@
-import { useState } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Cargando, ErrorApi } from '../../components/Estado'
+import { InsigniaEstado } from '../../components/InsigniaEstado'
+import { ETIQUETA_ESTADO } from '../../data/negocio'
 import { useApi } from '../../hooks'
-import { pedidosApi, precioCLP } from '../../services/artcrate.service'
+import { fechaHora, pedidosApi, precioCLP, usuariosApi } from '../../services/artcrate.service'
 import type { EstadoPedido } from '../../types'
 
-const ESTADOS: EstadoPedido[] = ['PENDIENTE_PAGO', 'PAGADO', 'ENVIADO', 'ENTREGADO', 'CANCELADO']
+const ESTADOS = Object.keys(ETIQUETA_ESTADO) as EstadoPedido[]
 
 export function PedidosAdmin() {
-  const [version, setVersion] = useState(0)
-  const [errorAccion, setErrorAccion] = useState<string | null>(null)
-  const { datos: pedidos, cargando, error } = useApi(pedidosApi.todos, [version])
+  const [params, setParams] = useSearchParams()
+  const estado = params.get('estado') ?? ''
+  const pedidos = useApi(pedidosApi.todos, [])
+  const usuarios = useApi(usuariosApi.todos, [])
 
-  async function cambiar(id: number, estado: EstadoPedido) {
-    setErrorAccion(null)
-    try {
-      await pedidosApi.cambiarEstado(id, estado)
-    } catch (e) {
-      setErrorAccion((e as Error).message)
-    }
-    setVersion((v) => v + 1)
+  const cliente = (id: number) => {
+    const u = usuarios.datos?.find((x) => x.id === id)
+    return u ? `${u.nombre} ${u.apellido}` : `Usuario ${id}`
   }
+  const cuantos = (e: string) => (pedidos.datos ?? []).filter((p) => !e || p.estado === e).length
+  // los más recientes primero
+  const lista = [...(pedidos.datos ?? [])].filter((p) => !estado || p.estado === estado).sort((a, b) => b.fecha.localeCompare(a.fecha))
 
   return (
     <>
-      <h1 className="mb-4">Pedidos</h1>
-      {cargando && <Cargando />}
-      {(error ?? errorAccion) && <ErrorApi mensaje={(error ?? errorAccion)!} />}
-      {pedidos && (
+      <h1 className="mb-3">Pedidos</h1>
+      <ul className="nav nav-pills mb-3 gap-2">
+        {[{ clave: '', texto: 'Todos' }, ...ESTADOS.map((e) => ({ clave: e, texto: ETIQUETA_ESTADO[e] }))].map((f) => (
+          <li className="nav-item" key={f.clave}>
+            <button className={`nav-link ${estado === f.clave ? 'active' : ''}`} onClick={() => setParams(f.clave ? { estado: f.clave } : {})}>
+              {f.texto} ({cuantos(f.clave)})
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {pedidos.cargando && !pedidos.datos && <Cargando />}
+      {pedidos.error && <ErrorApi mensaje={pedidos.error} />}
+      {pedidos.datos && (
         <div className="table-responsive">
           <table className="table align-middle">
-            <thead><tr><th>N°</th><th>Fecha</th><th>Cliente</th><th>Despacho</th><th>Total</th><th>Estado</th></tr></thead>
+            <thead><tr><th>N°</th><th>Fecha</th><th>Cliente</th><th>Despacho</th><th className="text-end">Total</th><th>Estado</th><th></th></tr></thead>
             <tbody>
-              {pedidos.map((p) => (
+              {lista.map((p) => (
                 <tr key={p.id}>
                   <td>#{p.id}</td>
-                  <td>{new Date(p.fecha).toLocaleDateString('es-CL')}</td>
-                  <td>Usuario {p.usuarioId}</td>
-                  <td>{p.direccionDespacho}, {p.comuna}</td>
-                  <td>{precioCLP(p.total)}</td>
-                  <td>
-                    <select className="form-select form-select-sm" value={p.estado} onChange={(e) => cambiar(p.id, e.target.value as EstadoPedido)}>
-                      {ESTADOS.map((s) => <option key={s} value={s}>{s.replace('_', ' ')}</option>)}
-                    </select>
-                  </td>
+                  <td>{fechaHora(p.fecha)}</td>
+                  <td>{cliente(p.usuarioId)}</td>
+                  <td>{p.comuna}, {p.region}</td>
+                  <td className="text-end">{precioCLP(p.total)}</td>
+                  <td><InsigniaEstado estado={p.estado} /></td>
+                  <td className="text-end"><Link className="btn btn-sm btn-outline-secondary" to={`/admin/pedidos/${p.id}`}>Ver detalle</Link></td>
                 </tr>
               ))}
+              {lista.length === 0 && <tr><td colSpan={7} className="text-center text-secondary py-4">No hay pedidos en esta vista.</td></tr>}
             </tbody>
           </table>
         </div>

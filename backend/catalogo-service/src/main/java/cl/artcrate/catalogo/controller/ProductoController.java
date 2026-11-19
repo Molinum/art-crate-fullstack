@@ -58,7 +58,8 @@ public class ProductoController {
         return service.actualizar(id, datos);
     }
 
-    @Operation(summary = "Eliminar un producto")
+    @Operation(summary = "Eliminar un producto (no permitido)",
+            description = "Siempre responde 409: los productos no se eliminan, se desactivan con PUT (activo = false).")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT) // 204
     public void eliminar(@PathVariable Long id) {

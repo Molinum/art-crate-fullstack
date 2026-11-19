@@ -50,7 +50,6 @@ export const catalogoApi = {
   producto: (id: number) => pedir<Producto>(`/api/productos/${id}`),
   crear: (datos: ProductoRequest) => pedir<Producto>('/api/productos', 'POST', datos),
   actualizar: (id: number, datos: ProductoRequest) => pedir<Producto>(`/api/productos/${id}`, 'PUT', datos),
-  eliminar: (id: number) => pedir<void>(`/api/productos/${id}`, 'DELETE'),
 }
 
 export const inventarioApi = {
@@ -61,6 +60,7 @@ export const inventarioApi = {
 
 export const usuariosApi = {
   todos: () => pedir<Usuario[]>('/api/usuarios'),
+  obtener: (id: number) => pedir<Usuario>(`/api/usuarios/${id}`),
   login: (correo: string, password: string) =>
     pedir<Usuario>('/api/usuarios/login', 'POST', { correo, password }),
   registro: (datos: RegistroRequest) => pedir<Usuario>('/api/usuarios/registro', 'POST', datos),
@@ -79,12 +79,14 @@ export const carritoApi = {
 
 export const pedidosApi = {
   crear: (datos: CrearPedidoRequest) => pedir<Pedido>('/api/pedidos', 'POST', datos),
+  obtener: (id: number) => pedir<Pedido>(`/api/pedidos/${id}`),
   deUsuario: (usuarioId: number) => pedir<Pedido[]>(`/api/pedidos/usuario/${usuarioId}`),
   todos: () => pedir<Pedido[]>('/api/pedidos'),
   cambiarEstado: (id: number, estado: EstadoPedido) => pedir<Pedido>(`/api/pedidos/${id}/estado`, 'PATCH', { estado }),
 }
 
 export const pagosApi = {
+  delPedido: (pedidoId: number) => pedir<Pago[]>(`/api/pagos/pedido/${pedidoId}`),
   pagar: (pedidoId: number, metodo: MetodoPago) =>
     pedir<Pago>('/api/pagos', 'POST', { pedidoId, metodo }),
 }
@@ -96,3 +98,19 @@ export const precioCLP = (n: number) => '$' + n.toLocaleString('es-CL')
 
 // Unidades totales de un carrito (suma de las cantidades de cada producto)
 export const unidadesCarrito = (c: Carrito) => c.items.reduce((total, i) => total + i.cantidad, 0)
+
+export const fechaHora = (iso: string) => new Date(iso).toLocaleString('es-CL', { dateStyle: 'medium', timeStyle: 'short' })
+
+// Los productos no se eliminan: para sacarlos de la tienda se vuelve a guardar el producto con activo = false
+export const productoARequest = (p: Producto, activo: boolean): ProductoRequest => ({
+  sku: p.sku,
+  nombre: p.nombre,
+  descripcion: p.descripcion,
+  precio: p.precio,
+  imagenUrl: p.imagenUrl,
+  marca: p.marca ?? '',
+  formato: p.formato ?? '',
+  contenido: p.contenido ?? '',
+  categoriaId: p.categoriaId,
+  activo,
+})

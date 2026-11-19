@@ -97,7 +97,7 @@ Todas las rutas se llaman a través del gateway (`http://localhost:8080`).
 | GET, PUT, DELETE | `/api/categorias/{id}` | Obtener, actualizar o eliminar |
 | GET | `/api/productos?categoriaId=&q=` | Listar productos (filtros opcionales) |
 | POST | `/api/productos` | Crear producto |
-| GET, PUT, DELETE | `/api/productos/{id}` | Obtener, actualizar o eliminar |
+| GET, PUT, DELETE | `/api/productos/{id}` | Obtener, actualizar (también para desactivar) o eliminar. El DELETE siempre responde 409: los productos no se eliminan para conservar el historial de pedidos |
 
 ### Inventario
 

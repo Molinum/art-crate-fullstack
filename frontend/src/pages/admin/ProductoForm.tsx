@@ -103,7 +103,7 @@ export function ProductoForm() {
           </div>
           <div className="col-12 form-check ms-2">
             <input id="activo" className="form-check-input" type="checkbox" checked={f.activo} onChange={(e) => setF({ ...f, activo: e.target.checked })} />
-            <label className="form-check-label" htmlFor="activo">Producto activo</label>
+            <label className="form-check-label" htmlFor="activo">Producto activo (visible en la tienda)</label>
           </div>
         </div>
         {error && <div className="mt-3"><ErrorApi mensaje={error} /></div>}

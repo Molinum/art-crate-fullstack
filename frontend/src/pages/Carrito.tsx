@@ -84,9 +84,9 @@ export function Carrito() {
     setErrorAccion(null)
     setCreando(true)
     try {
-      await pedidosApi.crear({ usuarioId: usuario!.id, ...dir })
+      const pedido = await pedidosApi.crear({ usuarioId: usuario!.id, ...dir })
       fijarCantidad(0) // el backend vacía el carrito al crear el pedido
-      navegar('/pedidos')
+      navegar(`/pedidos/${pedido.id}`) // se va al detalle del pedido para poder pagarlo
     } catch (err) {
       setErrorAccion((err as Error).message)
       setCreando(false)

@@ -65,8 +65,14 @@ public class ProductoService {
         return aRespuesta(repository.save(producto));
     }
 
+    /**
+     * Los productos no se eliminan: pueden estar en pedidos ya vendidos y ese historial debe poder consultarse.
+     * Para sacar un producto de la tienda se desactiva (activo = false) con la edición del producto.
+     */
     public void eliminar(Long id) {
-        repository.delete(buscar(id));
+        buscar(id); // si no existe, responde 404
+        throw new ConflictoException(
+                "Los productos no se pueden eliminar para conservar el historial de pedidos. Desactívalo para sacarlo de la tienda.");
     }
 
     // ----- métodos de apoyo -----
