@@ -63,7 +63,8 @@ public class UsuarioController {
         return service.actualizar(id, datos);
     }
 
-    @Operation(summary = "Eliminar un usuario")
+    @Operation(summary = "Eliminar un usuario (no permitido)",
+            description = "Siempre responde 409: los usuarios no se eliminan, se desactivan con PUT (activo = false).")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT) // 204
     public void eliminar(@PathVariable Long id) {

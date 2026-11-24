@@ -78,8 +78,11 @@ public class UsuarioService {
         return aRespuesta(repository.save(usuario));
     }
 
+    /** Los usuarios no se eliminan: sus pedidos quedan en el historial. Se desactivan con la actualización (activo = false). */
     public void eliminar(Long id) {
-        repository.delete(buscar(id));
+        buscar(id);
+        throw new ConflictoException(
+                "Los usuarios no se pueden eliminar para conservar el historial de pedidos. Desactívalo para impedir su acceso.");
     }
 
     // ----- métodos de apoyo -----

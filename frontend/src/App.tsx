@@ -5,11 +5,13 @@ import { Contacto } from './pages/Contacto'
 import { Faq } from './pages/Faq'
 import { Nosotros } from './pages/Nosotros'
 import { NoEncontrada } from './pages/NoEncontrada'
+import { Categorias } from './pages/admin/Categorias'
 import { Panel } from './pages/admin/Panel'
 import { PedidoAdmin } from './pages/admin/PedidoAdmin'
 import { PedidosAdmin } from './pages/admin/PedidosAdmin'
 import { ProductoForm } from './pages/admin/ProductoForm'
 import { Productos } from './pages/admin/Productos'
+import { Usuarios } from './pages/admin/Usuarios'
 import { Carrito } from './pages/Carrito'
 import { Catalogo } from './pages/Catalogo'
 import { Inicio } from './pages/Inicio'
@@ -41,6 +43,8 @@ function App() {
         <Route path="productos" element={<Productos />} />
         <Route path="productos/nuevo" element={<ProductoForm />} />
         <Route path="productos/:id" element={<ProductoForm />} />
+        <Route path="categorias" element={<Categorias />} />
+        <Route path="usuarios" element={<Usuarios />} />
         <Route path="pedidos" element={<PedidosAdmin />} />
         <Route path="pedidos/:id" element={<PedidoAdmin />} />
       </Route>

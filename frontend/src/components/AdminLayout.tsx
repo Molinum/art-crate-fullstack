@@ -21,7 +21,9 @@ export function AdminLayout() {
             <ul className="navbar-nav ms-auto flex-row flex-wrap">
               <li className="nav-item"><NavLink className="nav-link" to="/admin" end>Panel</NavLink></li>
               <li className="nav-item"><NavLink className="nav-link" to="/admin/productos">Productos</NavLink></li>
+              <li className="nav-item"><NavLink className="nav-link" to="/admin/categorias">Categorías</NavLink></li>
               <li className="nav-item"><NavLink className="nav-link" to="/admin/pedidos">Pedidos</NavLink></li>
+              <li className="nav-item"><NavLink className="nav-link" to="/admin/usuarios">Usuarios</NavLink></li>
               <li className="nav-item"><Link className="nav-link" to="/">Ver tienda</Link></li>
               <li className="nav-item">
                 <button className="nav-link" onClick={() => { setSaliendo(true); navegar('/'); cerrar() }}>Salir ({usuario.nombre})</button>

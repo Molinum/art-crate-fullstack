@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Cargando, ErrorApi } from '../../components/Estado'
 import { InsigniaEstado } from '../../components/InsigniaEstado'
@@ -11,6 +12,7 @@ const ESTADOS = Object.keys(ETIQUETA_ESTADO) as EstadoPedido[]
 export function PedidosAdmin() {
   const [params, setParams] = useSearchParams()
   const estado = params.get('estado') ?? ''
+  const [busqueda, setBusqueda] = useState('')
   const pedidos = useApi(pedidosApi.todos, [])
   const usuarios = useApi(usuariosApi.todos, [])
 
@@ -20,11 +22,17 @@ export function PedidosAdmin() {
   }
   const cuantos = (e: string) => (pedidos.datos ?? []).filter((p) => !e || p.estado === e).length
   // los más recientes primero
-  const lista = [...(pedidos.datos ?? [])].filter((p) => !estado || p.estado === estado).sort((a, b) => b.fecha.localeCompare(a.fecha))
+  const texto = busqueda.trim().toLowerCase().replace(/^#/, '')
+  const coincide = (p: { id: number; usuarioId: number }) => !texto || String(p.id) === texto || cliente(p.usuarioId).toLowerCase().includes(texto)
+  const lista = [...(pedidos.datos ?? [])].filter((p) => !estado || p.estado === estado).filter(coincide).sort((a, b) => b.fecha.localeCompare(a.fecha))
 
   return (
     <>
       <h1 className="mb-3">Pedidos</h1>
+      <input
+        className="form-control mb-3" style={{ maxWidth: 320 }} type="search" placeholder="Buscar por N° de pedido o cliente"
+        aria-label="Buscar pedido" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
+      />
       <ul className="nav nav-pills mb-3 gap-2">
         {[{ clave: '', texto: 'Todos' }, ...ESTADOS.map((e) => ({ clave: e, texto: ETIQUETA_ESTADO[e] }))].map((f) => (
           <li className="nav-item" key={f.clave}>

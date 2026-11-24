@@ -17,6 +17,7 @@ export function Productos() {
   const [params, setParams] = useSearchParams()
   const filtro = params.get('filtro') ?? ''
   const [version, setVersion] = useState(0)
+  const [busqueda, setBusqueda] = useState('')
   const [errorAccion, setErrorAccion] = useState<string | null>(null)
   const productos = useApi(() => catalogoApi.productos(), [version])
   const stock = useApi(inventarioApi.todos, [version])
@@ -27,7 +28,10 @@ export function Productos() {
     : clave === 'inactivos' ? !p.activo
     : clave === 'stock-bajo' ? p.activo && unidades(p.id) <= STOCK_BAJO
     : true
-  const lista = (productos.datos ?? []).filter((p) => cumple(p, filtro))
+  const texto = busqueda.trim().toLowerCase()
+  const lista = (productos.datos ?? [])
+    .filter((p) => cumple(p, filtro))
+    .filter((p) => !texto || `${p.sku} ${p.nombre} ${p.categoriaNombre}`.toLowerCase().includes(texto))
 
   // Los productos no se eliminan (pueden estar en pedidos ya vendidos): se activan o desactivan
   async function cambiarEstado(p: Producto) {
@@ -50,6 +54,10 @@ export function Productos() {
         Los productos no se eliminan, para conservar el historial de los pedidos ya vendidos. Si no quieres que se vendan, desactívalos y dejarán de mostrarse en la tienda.
       </p>
 
+      <input
+        className="form-control mb-3" style={{ maxWidth: 320 }} type="search" placeholder="Buscar por nombre, SKU o categoría"
+        aria-label="Buscar producto" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
+      />
       <ul className="nav nav-pills mb-3 gap-2">
         {FILTROS.map((f) => (
           <li className="nav-item" key={f.clave}>

@@ -9,6 +9,7 @@ import type {
   Pedido,
   Producto,
   ProductoRequest,
+  Rol,
   RegistroRequest,
   Stock,
   Usuario,
@@ -48,6 +49,10 @@ export const catalogoApi = {
     return pedir<Producto[]>('/api/productos' + (qs ? `?${qs}` : ''))
   },
   producto: (id: number) => pedir<Producto>(`/api/productos/${id}`),
+  crearCategoria: (nombre: string, descripcion: string) => pedir<Categoria>('/api/categorias', 'POST', { nombre, descripcion }),
+  actualizarCategoria: (id: number, nombre: string, descripcion: string) =>
+    pedir<Categoria>(`/api/categorias/${id}`, 'PUT', { nombre, descripcion }),
+  eliminarCategoria: (id: number) => pedir<void>(`/api/categorias/${id}`, 'DELETE'),
   crear: (datos: ProductoRequest) => pedir<Producto>('/api/productos', 'POST', datos),
   actualizar: (id: number, datos: ProductoRequest) => pedir<Producto>(`/api/productos/${id}`, 'PUT', datos),
 }
@@ -64,6 +69,11 @@ export const usuariosApi = {
   login: (correo: string, password: string) =>
     pedir<Usuario>('/api/usuarios/login', 'POST', { correo, password }),
   registro: (datos: RegistroRequest) => pedir<Usuario>('/api/usuarios/registro', 'POST', datos),
+  // Los usuarios no se eliminan: se desactivan (activo = false) y rol/activo se cambian con esta misma llamada
+  actualizar: (u: Usuario, cambios: { rol?: Rol; activo?: boolean }) =>
+    pedir<Usuario>(`/api/usuarios/${u.id}`, 'PUT', {
+      nombre: u.nombre, apellido: u.apellido, telefono: u.telefono, region: u.region, rol: u.rol, activo: u.activo, ...cambios,
+    }),
 }
 
 export const carritoApi = {
