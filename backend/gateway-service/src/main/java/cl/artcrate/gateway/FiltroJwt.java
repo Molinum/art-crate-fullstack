@@ -29,9 +29,7 @@ import reactor.core.publisher.Mono;
  *
  *   - Sin token o token inválido/vencido -> 401
  *   - Token válido pero sin permiso      -> 403
- *   - Si pasa, agrega X-Usuario-Id y X-Usuario-Rol para los servicios (y borra los que haya mandado el cliente).
- *
- * Los servicios se llaman entre sí directo por Eureka (sin pasar por aquí), así que solo se protege la entrada.
+ *   - Si pasa, la petición sigue con su token: cada servicio lo valida de nuevo (ver seguridad/FiltroJwt en cada uno).
  */
 @Component
 public class FiltroJwt implements GlobalFilter, Ordered {
@@ -64,15 +62,7 @@ public class FiltroJwt implements GlobalFilter, Ordered {
             return rechazar(exchange, HttpStatus.FORBIDDEN, "No tienes permiso para realizar esta acción");
         }
 
-        var peticion = exchange.getRequest().mutate()
-                .headers(h -> {
-                    h.remove("X-Usuario-Id");
-                    h.remove("X-Usuario-Rol");
-                    h.add("X-Usuario-Id", claims.getSubject());
-                    h.add("X-Usuario-Rol", claims.get("rol", String.class));
-                })
-                .build();
-        return chain.filter(exchange.mutate().request(peticion).build());
+        return chain.filter(exchange); // el token sigue su camino: cada servicio lo vuelve a validar
     }
 
     /** Rutas que no piden sesión: login, registro, catálogo (solo lectura), stock (solo lectura) y documentación. */

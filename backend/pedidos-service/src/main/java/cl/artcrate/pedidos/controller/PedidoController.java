@@ -3,9 +3,12 @@ package cl.artcrate.pedidos.controller;
 import cl.artcrate.pedidos.dto.CambiarEstadoRequest;
 import cl.artcrate.pedidos.dto.CrearPedidoRequest;
 import cl.artcrate.pedidos.dto.PedidoResponse;
+import cl.artcrate.pedidos.exception.ProhibidoException;
+import cl.artcrate.pedidos.seguridad.FiltroJwt;
 import cl.artcrate.pedidos.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -33,7 +36,8 @@ public class PedidoController {
     @Operation(summary = "Crear un pedido a partir del carrito")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED) // 201
-    public PedidoResponse crear(@Valid @RequestBody CrearPedidoRequest datos) {
+    public PedidoResponse crear(@Valid @RequestBody CrearPedidoRequest datos, HttpServletRequest req) {
+        exigirPropio(req, datos.usuarioId());
         return service.crear(datos);
     }
 
@@ -45,8 +49,10 @@ public class PedidoController {
 
     @Operation(summary = "Obtener un pedido por id")
     @GetMapping("/{id}")
-    public PedidoResponse obtener(@PathVariable Long id) {
-        return service.obtener(id);
+    public PedidoResponse obtener(@PathVariable Long id, HttpServletRequest req) {
+        PedidoResponse pedido = service.obtener(id);
+        exigirPropio(req, pedido.usuarioId());
+        return pedido;
     }
 
     @Operation(summary = "Listar los pedidos de un usuario")
@@ -59,5 +65,14 @@ public class PedidoController {
     @PatchMapping("/{id}/estado")
     public PedidoResponse cambiarEstado(@PathVariable Long id, @Valid @RequestBody CambiarEstadoRequest datos) {
         return service.cambiarEstado(id, datos.estado());
+    }
+
+    /** Un cliente solo puede crear y ver SUS pedidos; el administrador y los servicios internos pueden con cualquiera. */
+    private void exigirPropio(HttpServletRequest req, Long usuarioId) {
+        String rol = (String) req.getAttribute(FiltroJwt.ATRIBUTO_ROL);
+        boolean privilegiado = "ADMIN".equals(rol) || "SERVICIO".equals(rol);
+        if (!privilegiado && !String.valueOf(usuarioId).equals(req.getAttribute(FiltroJwt.ATRIBUTO_USUARIO))) {
+            throw new ProhibidoException("No tienes permiso para acceder a este pedido");
+        }
     }
 }
