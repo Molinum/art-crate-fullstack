@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { formatearNumero, formatearVencimiento, luhnValido, vencimientoValido } from '../data/tarjeta'
 import { precioCLP } from '../services/artcrate.service'
 import type { MetodoPago } from '../types'
 
@@ -7,30 +8,6 @@ interface Props {
   total: number
   procesando: boolean
   onPagar: (metodo: MetodoPago, ultimosDigitos?: string) => void
-}
-
-// Algoritmo de Luhn: detecta números de tarjeta mal escritos
-function luhnValido(numero: string) {
-  let suma = 0
-  for (let i = 0; i < numero.length; i++) {
-    let d = Number(numero[numero.length - 1 - i])
-    if (i % 2 === 1) {
-      d *= 2
-      if (d > 9) d -= 9
-    }
-    suma += d
-  }
-  return suma % 10 === 0
-}
-
-function vencimientoValido(texto: string) {
-  const m = /^(\d{2})\/(\d{2})$/.exec(texto)
-  if (!m) return false
-  const mes = Number(m[1])
-  const anio = 2000 + Number(m[2])
-  if (mes < 1 || mes > 12) return false
-  const hoy = new Date()
-  return anio > hoy.getFullYear() || (anio === hoy.getFullYear() && mes >= hoy.getMonth() + 1)
 }
 
 const TARJETAS_PRUEBA = [
@@ -48,12 +25,8 @@ export function FormularioPago({ pedidoId, total, procesando, onPagar }: Props) 
   const [cvv, setCvv] = useState('')
   const [errores, setErrores] = useState<Record<string, string>>({})
 
-  // Formatea mientras se escribe: "4242 4242 4242 4242" y "MM/AA"
-  const cambiarNumero = (v: string) => setNumero(v.replace(/\D/g, '').slice(0, 16).replace(/(\d{4})(?=\d)/g, '$1 '))
-  const cambiarVence = (v: string) => {
-    const d = v.replace(/\D/g, '').slice(0, 4)
-    setVence(d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d)
-  }
+  const cambiarNumero = (v: string) => setNumero(formatearNumero(v))
+  const cambiarVence = (v: string) => setVence(formatearVencimiento(v))
 
   function enviarTarjeta(e: React.FormEvent) {
     e.preventDefault()

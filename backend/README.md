@@ -171,6 +171,24 @@ artcrate-backend/
     carrito-service, pedidos-service, pagos-service
 ```
 
+## Pruebas unitarias
+
+JUnit 5 + Mockito, sin base de datos ni servicios levantados (los repositorios y clientes se simulan):
+
+```
+mvn test                       # todos los servicios
+mvn test -pl pagos-service     # solo uno
+```
+
+| Servicio | Qué se prueba |
+|---|---|
+| usuarios | registro (rol CLIENTE, solo se guarda el hash BCrypt), login, usuarios desactivados, que no se elimine un usuario, generación del JWT |
+| catalogo | que no se eliminen productos, categorías con productos y nombres duplicados |
+| inventario | descontar todo o nada, agrupar repetidos, reponer, validaciones |
+| pedidos | crear pedido (total recalculado, deshacer si algo falla), flujo de estados, cancelar repone stock |
+| pagos | tarjetas de prueba (0002, 9995, 0069), pedido no pendiente, pagos de otro usuario, deshacer el pago |
+| gateway y todos los servicios | `FiltroJwt`: quién puede llamar a cada ruta según su rol, token vencido, falso o mal formado |
+
 ## Notas
 
 - No hay seguridad (JWT ni roles) ni pruebas automáticas; las pruebas se hicieron a mano con Postman y curl.
