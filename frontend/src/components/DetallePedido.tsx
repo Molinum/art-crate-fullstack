@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { ETIQUETA_ESTADO, FLUJO } from '../data/negocio'
 import { fechaHora, precioCLP } from '../services/artcrate.service'
 import type { Pago, Pedido, Usuario } from '../types'
@@ -80,7 +81,9 @@ export function DetallePedido({ pedido, pago, cliente }: Props) {
                 <dt>Estado</dt><dd>{pago.estado === 'APROBADO' ? 'Aprobado' : pago.estado}</dd>
                 <dt>Monto</dt><dd>{precioCLP(pago.monto)}</dd>
                 <dt>Fecha</dt><dd>{fechaHora(pago.fecha)}</dd>
-                <dt>Código de transacción</dt><dd className="mb-0 text-break">{pago.codigoTransaccion}</dd>
+                {pago.ultimosDigitos && <><dt>Tarjeta</dt><dd>•••• {pago.ultimosDigitos}</dd></>}
+                <dt>Código de transacción</dt><dd className="text-break">{pago.codigoTransaccion}</dd>
+                <dd className="mb-0"><Link to={`/pedidos/${pedido.id}/comprobante`}>Ver comprobante</Link></dd>
               </dl>
             ) : (
               <p className="mb-0 small">{pedido.estado === 'CANCELADO' ? 'El pedido se canceló sin registrar un pago.' : 'Aún no hay un pago registrado.'}</p>

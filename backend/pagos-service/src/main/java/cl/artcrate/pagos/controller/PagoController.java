@@ -2,9 +2,11 @@ package cl.artcrate.pagos.controller;
 
 import cl.artcrate.pagos.dto.CrearPagoRequest;
 import cl.artcrate.pagos.dto.PagoResponse;
+import cl.artcrate.pagos.seguridad.FiltroJwt;
 import cl.artcrate.pagos.service.PagoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -28,22 +30,33 @@ public class PagoController {
         this.service = service;
     }
 
-    @Operation(summary = "Pagar un pedido")
+    @Operation(summary = "Pagar un pedido",
+            description = "Responde 201 con el pago; si la tarjeta es rechazada el pago queda con estado RECHAZADO y el pedido sigue pendiente. "
+                    + "Tarjetas de prueba (por los últimos 4 dígitos): 0002 rechazada, 9995 fondos insuficientes, 0069 vencida; el resto se aprueba.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED) // 201
-    public PagoResponse pagar(@Valid @RequestBody CrearPagoRequest datos) {
-        return service.pagar(datos);
+    public PagoResponse pagar(@Valid @RequestBody CrearPagoRequest datos, HttpServletRequest req) {
+        return service.pagar(datos, usuario(req), privilegiado(req));
     }
 
     @Operation(summary = "Obtener un pago por id")
     @GetMapping("/{id}")
-    public PagoResponse obtener(@PathVariable Long id) {
-        return service.obtener(id);
+    public PagoResponse obtener(@PathVariable Long id, HttpServletRequest req) {
+        return service.obtener(id, usuario(req), privilegiado(req));
     }
 
     @Operation(summary = "Listar los pagos de un pedido")
     @GetMapping("/pedido/{pedidoId}")
-    public List<PagoResponse> listarPorPedido(@PathVariable Long pedidoId) {
-        return service.listarPorPedido(pedidoId);
+    public List<PagoResponse> listarPorPedido(@PathVariable Long pedidoId, HttpServletRequest req) {
+        return service.listarPorPedido(pedidoId, usuario(req), privilegiado(req));
+    }
+
+    private String usuario(HttpServletRequest req) {
+        return (String) req.getAttribute(FiltroJwt.ATRIBUTO_USUARIO);
+    }
+
+    private boolean privilegiado(HttpServletRequest req) {
+        String rol = (String) req.getAttribute(FiltroJwt.ATRIBUTO_ROL);
+        return "ADMIN".equals(rol) || "SERVICIO".equals(rol);
     }
 }

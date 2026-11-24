@@ -96,9 +96,11 @@ export interface Pago {
   pedidoId: number
   monto: number
   metodo: MetodoPago
-  estado: string
+  estado: 'APROBADO' | 'RECHAZADO'
   fecha: string
   codigoTransaccion: string
+  ultimosDigitos: string | null
+  motivoRechazo: string | null
 }
 
 export interface ProductoRequest {

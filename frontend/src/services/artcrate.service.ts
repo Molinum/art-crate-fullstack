@@ -114,8 +114,10 @@ export const pedidosApi = {
 
 export const pagosApi = {
   delPedido: (pedidoId: number) => pedir<Pago[]>(`/api/pagos/pedido/${pedidoId}`),
-  pagar: (pedidoId: number, metodo: MetodoPago) =>
-    pedir<Pago>('/api/pagos', 'POST', { pedidoId, metodo }),
+  // Con tarjeta solo se envían los últimos 4 dígitos: el número completo no sale del navegador.
+  // Si el banco rechaza el pago la respuesta es un Pago con estado RECHAZADO (el pedido sigue pendiente).
+  pagar: (pedidoId: number, metodo: MetodoPago, ultimosDigitos?: string) =>
+    pedir<Pago>('/api/pagos', 'POST', { pedidoId, metodo, ultimosDigitos }),
 }
 
 // imagenUrl viene como "assets/img/x.svg": se sirve desde /public

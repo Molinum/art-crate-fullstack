@@ -11,5 +11,7 @@ public record PagoResponse(
         MetodoPago metodo,
         EstadoPago estado,
         LocalDateTime fecha,
-        String codigoTransaccion) {
+        String codigoTransaccion,
+        String ultimosDigitos,
+        String motivoRechazo) {
 }

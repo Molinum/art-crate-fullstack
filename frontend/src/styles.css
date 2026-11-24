@@ -467,3 +467,8 @@ header .navbar-nav .nav-link.active .contador-carrito { background-color: var(--
 .tarjeta-kpi:hover { transform: translateY(-3px); box-shadow: var(--ac-sombra-hover); color: inherit; }
 .barra-ventas { height: 10px; border-radius: 999px; background: var(--ac-arena); overflow: hidden; }
 .barra-ventas > div { height: 100%; background: var(--ac-terracota); border-radius: 999px; }
+
+/* Al imprimir el comprobante solo se muestra el documento */
+@media print {
+  header, footer, .no-imprimir { display: none !important; }
+}

@@ -55,7 +55,7 @@ export function PedidoAdmin() {
       {aviso && <div className="alert alert-success" role="status">{aviso}</div>}
       {errorAccion && <ErrorApi mensaje={errorAccion} />}
 
-      <DetallePedido pedido={p} pago={pagos.datos?.[0] ?? null} cliente={cliente.datos} />
+      <DetallePedido pedido={p} pago={pagos.datos?.find((x) => x.estado === 'APROBADO') ?? null} cliente={cliente.datos} />
 
       <section className="card formulario-card mt-4"><div className="card-body">
         <h2 className="h5">Gestionar pedido</h2>

@@ -41,6 +41,12 @@ public class Pago {
     @Column(nullable = false, unique = true)
     private String codigoTransaccion;
 
+    // Solo los últimos 4 dígitos de la tarjeta (nunca se recibe ni se guarda el número completo)
+    private String ultimosDigitos;
+
+    // Por qué se rechazó el pago (solo si el estado es RECHAZADO)
+    private String motivoRechazo;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -61,4 +67,10 @@ public class Pago {
 
     public String getCodigoTransaccion() { return codigoTransaccion; }
     public void setCodigoTransaccion(String codigoTransaccion) { this.codigoTransaccion = codigoTransaccion; }
+
+    public String getUltimosDigitos() { return ultimosDigitos; }
+    public void setUltimosDigitos(String ultimosDigitos) { this.ultimosDigitos = ultimosDigitos; }
+
+    public String getMotivoRechazo() { return motivoRechazo; }
+    public void setMotivoRechazo(String motivoRechazo) { this.motivoRechazo = motivoRechazo; }
 }

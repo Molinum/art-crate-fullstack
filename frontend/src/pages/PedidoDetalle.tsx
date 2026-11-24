@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { DetallePedido } from '../components/DetallePedido'
 import { Cargando, ErrorApi } from '../components/Estado'
+import { FormularioPago } from '../components/FormularioPago'
 import { useSesion } from '../context/SesionContext'
 import { useApi } from '../hooks'
 import { pagosApi, pedidosApi } from '../services/artcrate.service'
@@ -14,7 +15,6 @@ export function PedidoDetalle() {
   const [version, setVersion] = useState(0) // se incrementa para volver a pedir el pedido y su pago
   const pedido = useApi(() => pedidosApi.obtener(Number(id)), [id, version])
   const pagos = useApi(() => pagosApi.delPedido(Number(id)), [id, version])
-  const [metodo, setMetodo] = useState<MetodoPago>('TARJETA')
   const [procesando, setProcesando] = useState(false)
   const [aviso, setAviso] = useState<string | null>(null)
   const [errorAccion, setErrorAccion] = useState<string | null>(null)
@@ -47,7 +47,29 @@ export function PedidoDetalle() {
     }
   }
 
-  const pago = pagos.datos?.[0] ?? null
+  const pago = pagos.datos?.find((x) => x.estado === 'APROBADO') ?? null
+  const rechazados = (pagos.datos ?? []).filter((x) => x.estado === 'RECHAZADO')
+
+  // Pago simulado: una pequeña espera hace visible el "procesando". Un rechazo del banco no es un error de la app.
+  async function pagar(metodo: MetodoPago, ultimosDigitos?: string) {
+    setProcesando(true)
+    setAviso(null)
+    setErrorAccion(null)
+    try {
+      await new Promise((r) => setTimeout(r, 1200))
+      const resultado = await pagosApi.pagar(p.id, metodo, ultimosDigitos)
+      if (resultado.estado === 'RECHAZADO') {
+        setErrorAccion(`Pago rechazado: ${resultado.motivoRechazo ?? 'el banco no autorizó el pago'}. Puedes intentarlo con otra tarjeta o pagar por transferencia.`)
+      } else {
+        setAviso('¡Pago aprobado! Tu pedido quedó confirmado.')
+      }
+      setVersion((v) => v + 1)
+    } catch (e) {
+      setErrorAccion((e as Error).message)
+    } finally {
+      setProcesando(false)
+    }
+  }
 
   return (
     <div className="container py-5">
@@ -64,35 +86,23 @@ export function PedidoDetalle() {
       <DetallePedido pedido={p} pago={pago} />
 
       {p.estado === 'PENDIENTE_PAGO' && (
-        <section className="card formulario-card mt-4"><div className="card-body">
-          <h2 className="h5">Pagar el pedido</h2>
-          <div className="d-flex flex-wrap align-items-center gap-2">
-            <label htmlFor="metodo" className="form-label mb-0">Método de pago</label>
-            <select id="metodo" className="form-select w-auto" value={metodo} onChange={(e) => setMetodo(e.target.value as MetodoPago)}>
-              <option value="TARJETA">Tarjeta</option>
-              <option value="TRANSFERENCIA">Transferencia</option>
-            </select>
-            <button
-              className="btn btn-primary"
-              disabled={procesando}
-              onClick={() => ejecutar(() => pagosApi.pagar(p.id, metodo), '¡Pago aprobado! Tu pedido quedó confirmado.')}
-            >
-              {procesando ? 'Procesando...' : 'Pagar ahora'}
-            </button>
-            <button
-              className="btn btn-outline-danger"
-              disabled={procesando}
-              onClick={() => {
-                if (window.confirm('¿Cancelar este pedido? Los productos volverán al inventario.')) {
-                  ejecutar(() => pedidosApi.cambiarEstado(p.id, 'CANCELADO'), 'El pedido fue cancelado.')
-                }
-              }}
-            >
-              Cancelar pedido
-            </button>
-          </div>
-          <p className="small text-secondary mt-2 mb-0">El pago es simulado: no se realiza ningún cobro real.</p>
-        </div></section>
+        <>
+          <FormularioPago pedidoId={p.id} total={p.total} procesando={procesando} onPagar={pagar} />
+          {rechazados.length > 0 && (
+            <p className="small text-secondary mt-3 mb-0">Intentos de pago rechazados: {rechazados.length}</p>
+          )}
+          <button
+            className="btn btn-outline-danger mt-3"
+            disabled={procesando}
+            onClick={() => {
+              if (window.confirm('¿Cancelar este pedido? Los productos volverán al inventario.')) {
+                ejecutar(() => pedidosApi.cambiarEstado(p.id, 'CANCELADO'), 'El pedido fue cancelado.')
+              }
+            }}
+          >
+            Cancelar pedido
+          </button>
+        </>
       )}
     </div>
   )

@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import { AdminLayout } from './components/AdminLayout'
 import { Layout } from './components/Layout'
+import { Comprobante } from './pages/Comprobante'
 import { Contacto } from './pages/Contacto'
 import { Faq } from './pages/Faq'
 import { Nosotros } from './pages/Nosotros'
@@ -33,6 +34,7 @@ function App() {
         <Route path="/carrito" element={<Carrito />} />
         <Route path="/pedidos" element={<Pedidos />} />
         <Route path="/pedidos/:id" element={<PedidoDetalle />} />
+        <Route path="/pedidos/:id/comprobante" element={<Comprobante />} />
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/nosotros" element={<Nosotros />} />
         <Route path="/faq" element={<Faq />} />
