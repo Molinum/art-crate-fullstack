@@ -75,7 +75,7 @@ npm test            # corre todas una vez
 npm run test:watch  # se vuelve a ejecutar al guardar
 ```
 
-Cubren las validaciones de tarjeta (Luhn y vencimiento), el formulario de pago, la sesión (token guardado y cierre), el envío del token y el manejo de errores 401/4xx/5xx en las llamadas a la API, y las reglas de negocio compartidas.
+Cubren las validaciones de tarjeta (Luhn y vencimiento), el formulario de pago, la sesión (token guardado y cierre), el envío del token y el manejo de errores 401/4xx/5xx en las llamadas a la API, el botón "Agregar al carrito" de las tarjetas del catálogo (sin sesión, sin stock, errores del servidor) y las reglas de negocio compartidas.
 
 ## Usuarios de prueba
 

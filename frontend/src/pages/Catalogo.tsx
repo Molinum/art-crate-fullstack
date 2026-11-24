@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Cargando, ErrorApi } from '../components/Estado'
 import { TarjetaProducto } from '../components/TarjetaProducto'
 import { useApi } from '../hooks'
-import { catalogoApi } from '../services/artcrate.service'
+import { catalogoApi, inventarioApi } from '../services/artcrate.service'
 
 export function Catalogo() {
   const [params, setParams] = useSearchParams()
@@ -13,6 +13,7 @@ export function Catalogo() {
   const [orden, setOrden] = useState('')
 
   const categorias = useApi(catalogoApi.categorias, [])
+  const stock = useApi(inventarioApi.todos, []) // si falla, el botón igual se muestra y el servidor valida el stock
   const productos = useApi(() => catalogoApi.productos(categoriaId, q || undefined), [categoriaId, q])
 
   // la tienda solo muestra productos activos; el orden se aplica en el navegador
@@ -80,7 +81,9 @@ export function Catalogo() {
       {productos.datos && <p className="text-secondary small">{lista.length} {lista.length === 1 ? 'producto' : 'productos'}</p>}
       {productos.datos && lista.length === 0 && <p>No hay productos que coincidan.</p>}
       <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
-        {lista.map((p) => <TarjetaProducto key={p.id} producto={p} />)}
+        {lista.map((p) => (
+          <TarjetaProducto key={p.id} producto={p} agregable stock={stock.datos?.find((s) => s.productoId === p.id)?.cantidad} />
+        ))}
       </div>
     </div>
   )

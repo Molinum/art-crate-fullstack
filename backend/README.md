@@ -184,6 +184,7 @@ mvn test -pl pagos-service     # solo uno
 |---|---|
 | usuarios | registro (rol CLIENTE, solo se guarda el hash BCrypt), login, usuarios desactivados, que no se elimine un usuario, generación del JWT |
 | catalogo | que no se eliminen productos, categorías con productos y nombres duplicados |
+| carrito | agregar (datos del catálogo, sumar cantidades, nunca superar el stock, producto desactivado), cambiar cantidad, quitar, vaciar y total calculado |
 | inventario | descontar todo o nada, agrupar repetidos, reponer, validaciones |
 | pedidos | crear pedido (total recalculado, deshacer si algo falla), flujo de estados, cancelar repone stock |
 | pagos | tarjetas de prueba (0002, 9995, 0069), pedido no pendiente, pagos de otro usuario, deshacer el pago |
