@@ -1,9 +1,10 @@
 import { createContext, useContext, useState, type ReactNode } from 'react'
+import { CLAVE_TOKEN } from '../services/artcrate.service'
 import type { Usuario } from '../types'
 
 interface SesionValor {
   usuario: Usuario | null
-  iniciar: (u: Usuario) => void
+  iniciar: (u: Usuario, token: string) => void
   cerrar: () => void
 }
 
@@ -19,18 +20,20 @@ function leerGuardado(): Usuario | null {
   }
 }
 
-// El backend no entrega JWT todavía: solo se guarda el usuario devuelto por el login
+// El login entrega un JWT: se guarda junto al usuario y artcrate.service lo envía en cada llamada
 export function SesionProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(leerGuardado)
 
-  function iniciar(u: Usuario) {
+  function iniciar(u: Usuario, token: string) {
     setUsuario(u)
     localStorage.setItem(CLAVE, JSON.stringify(u))
+    localStorage.setItem(CLAVE_TOKEN, token)
   }
 
   function cerrar() {
     setUsuario(null)
     localStorage.removeItem(CLAVE)
+    localStorage.removeItem(CLAVE_TOKEN)
   }
 
   return <SesionContext.Provider value={{ usuario, iniciar, cerrar }}>{children}</SesionContext.Provider>

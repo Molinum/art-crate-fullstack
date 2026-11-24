@@ -2,6 +2,7 @@ package cl.artcrate.usuarios.controller;
 
 import cl.artcrate.usuarios.dto.ActualizarUsuarioRequest;
 import cl.artcrate.usuarios.dto.LoginRequest;
+import cl.artcrate.usuarios.dto.LoginResponse;
 import cl.artcrate.usuarios.dto.RegistroRequest;
 import cl.artcrate.usuarios.dto.UsuarioResponse;
 import cl.artcrate.usuarios.service.UsuarioService;
@@ -39,9 +40,9 @@ public class UsuarioController {
         return service.registrar(datos);
     }
 
-    @Operation(summary = "Iniciar sesión")
+    @Operation(summary = "Iniciar sesión", description = "Devuelve el token JWT: se envía como 'Authorization: Bearer <token>'.")
     @PostMapping("/login")
-    public UsuarioResponse login(@Valid @RequestBody LoginRequest datos) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest datos) {
         return service.login(datos);
     }
 

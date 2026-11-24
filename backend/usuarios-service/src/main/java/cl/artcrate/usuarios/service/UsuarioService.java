@@ -2,6 +2,7 @@ package cl.artcrate.usuarios.service;
 
 import cl.artcrate.usuarios.dto.ActualizarUsuarioRequest;
 import cl.artcrate.usuarios.dto.LoginRequest;
+import cl.artcrate.usuarios.dto.LoginResponse;
 import cl.artcrate.usuarios.dto.RegistroRequest;
 import cl.artcrate.usuarios.dto.UsuarioResponse;
 import cl.artcrate.usuarios.exception.ConflictoException;
@@ -20,10 +21,12 @@ public class UsuarioService {
 
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public UsuarioResponse registrar(RegistroRequest datos) {
@@ -43,7 +46,7 @@ public class UsuarioService {
         return aRespuesta(repository.save(usuario));
     }
 
-    public UsuarioResponse login(LoginRequest datos) {
+    public LoginResponse login(LoginRequest datos) {
         // El mismo mensaje para correo inexistente y contraseña errónea: no se revela cuál falló
         Usuario usuario = repository.findByCorreo(normalizar(datos.correo()))
                 .orElseThrow(() -> new CredencialesInvalidasException("Correo o contraseña incorrectos"));
@@ -52,7 +55,7 @@ public class UsuarioService {
         if (!passwordCorrecta || !usuario.isActivo()) {
             throw new CredencialesInvalidasException("Correo o contraseña incorrectos");
         }
-        return aRespuesta(usuario);
+        return new LoginResponse(jwtService.generar(usuario), aRespuesta(usuario));
     }
 
     public List<UsuarioResponse> listar() {

@@ -66,7 +66,7 @@ export function Registro() {
     setEnviando(true)
     setErrorApi(null)
     try {
-      const usuario = await usuariosApi.registro({
+      await usuariosApi.registro({
         nombre: v.nombre.trim(),
         apellido: v.apellido.trim(),
         correo: v.correo.trim(),
@@ -74,7 +74,9 @@ export function Registro() {
         telefono: v.telefono ? `+569${v.telefono}` : undefined,
         region: v.region,
       })
-      iniciar({ ...usuario, comuna: v.comuna })
+      // al registrarse se inicia sesión de inmediato para obtener el token
+      const { token, usuario } = await usuariosApi.login(v.correo.trim(), v.password)
+      iniciar({ ...usuario, comuna: v.comuna }, token)
       navegar('/')
     } catch (err) {
       setErrorApi((err as Error).message)

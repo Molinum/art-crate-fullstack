@@ -38,7 +38,10 @@ export async function llamarApi(
 
   const res = await fetch(base + ruta, {
     method: metodo,
-    headers: tieneCuerpo ? { 'Content-Type': 'application/json' } : undefined,
+    headers: {
+      ...(tieneCuerpo ? { 'Content-Type': 'application/json' } : {}),
+      ...(localStorage.getItem('artcrate.token') ? { Authorization: `Bearer ${localStorage.getItem('artcrate.token')}` } : {}),
+    },
     body: tieneCuerpo ? cuerpo : undefined,
   })
 

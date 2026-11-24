@@ -18,8 +18,8 @@ export function Login() {
     if (!/.+@.+\..+/.test(correo)) return setError('El correo no tiene un formato válido (ej: nombre@dominio.cl)')
     if (!password) return setError('La contraseña es obligatoria')
     try {
-      const usuario = await usuariosApi.login(correo, password)
-      iniciar(usuario)
+      const { token, usuario } = await usuariosApi.login(correo, password)
+      iniciar(usuario, token)
       navegar(usuario.rol === 'ADMIN' ? '/admin' : '/') // el administrador entra directo a su panel
     } catch (err) {
       setError((err as Error).message)

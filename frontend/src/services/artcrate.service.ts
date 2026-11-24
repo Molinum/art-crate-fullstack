@@ -18,12 +18,22 @@ import type {
 // Todas las llamadas van al API Gateway (único con CORS habilitado)
 const MENSAJE_GENERICO = 'Ocurrió un problema al procesar tu solicitud. Inténtalo nuevamente en unos minutos.'
 
+// El token JWT lo guarda SesionContext al iniciar sesión y se envía en cada llamada
+export const CLAVE_TOKEN = 'artcrate.token'
+const leerToken = () => {
+  try { return localStorage.getItem(CLAVE_TOKEN) } catch { return null }
+}
+
 async function pedir<T>(ruta: string, metodo = 'GET', cuerpo?: unknown): Promise<T> {
   let res: Response
+  const token = leerToken()
   try {
     res = await fetch(API_URL + ruta, {
       method: metodo,
-      headers: cuerpo !== undefined ? { 'Content-Type': 'application/json' } : undefined,
+      headers: {
+        ...(cuerpo !== undefined ? { 'Content-Type': 'application/json' } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: cuerpo !== undefined ? JSON.stringify(cuerpo) : undefined,
     })
   } catch {
@@ -31,6 +41,13 @@ async function pedir<T>(ruta: string, metodo = 'GET', cuerpo?: unknown): Promise
   }
   const texto = await res.text()
   const datos = texto ? JSON.parse(texto) : null
+  // Token vencido o inválido: se cierra la sesión y se pide iniciar sesión de nuevo
+  if (res.status === 401 && token) {
+    localStorage.removeItem(CLAVE_TOKEN)
+    localStorage.removeItem('artcrate.usuario')
+    window.location.assign('/login')
+    throw new Error('Tu sesión expiró. Inicia sesión nuevamente.')
+  }
   if (!res.ok) {
     // los errores de validación (4xx) traen un mensaje pensado para el usuario; los 5xx no se muestran tal cual
     const mensaje = res.status < 500 ? (datos?.message ?? datos?.mensaje) : null
@@ -67,7 +84,7 @@ export const usuariosApi = {
   todos: () => pedir<Usuario[]>('/api/usuarios'),
   obtener: (id: number) => pedir<Usuario>(`/api/usuarios/${id}`),
   login: (correo: string, password: string) =>
-    pedir<Usuario>('/api/usuarios/login', 'POST', { correo, password }),
+    pedir<{ token: string; usuario: Usuario }>('/api/usuarios/login', 'POST', { correo, password }),
   registro: (datos: RegistroRequest) => pedir<Usuario>('/api/usuarios/registro', 'POST', datos),
   // Los usuarios no se eliminan: se desactivan (activo = false) y rol/activo se cambian con esta misma llamada
   actualizar: (u: Usuario, cambios: { rol?: Rol; activo?: boolean }) =>

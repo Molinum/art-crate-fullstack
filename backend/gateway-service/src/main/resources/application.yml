@@ -114,6 +114,11 @@ springdoc:
       - name: pagos
         url: /docs/pagos/v3/api-docs
 
+# ----- JWT: misma clave que usuarios-service (que es quien firma los tokens) -----
+artcrate:
+  jwt:
+    secret: ${JWT_SECRET:artcrate-clave-jwt-solo-para-desarrollo-2026}
+
 # ----- Eureka: de aquí el gateway averigua dónde está cada servicio -----
 eureka:
   client:
