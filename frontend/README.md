@@ -9,6 +9,7 @@ Es la versión en React + TypeScript del sitio estático original ([ArtCrate](ht
 - React 19 y TypeScript
 - Vite
 - React Router
+- Axios
 - Bootstrap 5.3 y CSS propio (`src/styles.css`)
 
 ## Requisitos

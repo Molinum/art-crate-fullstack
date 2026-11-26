@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 export const API_URL = 'http://localhost:8080'
 
 export type Metodo = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -36,28 +38,24 @@ export async function llamarApi(
   const inicio = performance.now()
   const tieneCuerpo = metodo !== 'GET' && metodo !== 'DELETE' && !!cuerpo?.trim()
 
-  const res = await fetch(base + ruta, {
+  const token = localStorage.getItem('artcrate.token')
+
+  const res = await axios.request({
+    url: base + ruta,
     method: metodo,
     headers: {
       ...(tieneCuerpo ? { 'Content-Type': 'application/json' } : {}),
-      ...(localStorage.getItem('artcrate.token') ? { Authorization: `Bearer ${localStorage.getItem('artcrate.token')}` } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    body: tieneCuerpo ? cuerpo : undefined,
+    data: tieneCuerpo ? cuerpo : undefined,
+    validateStatus: () => true, // esta pantalla de prueba también muestra las respuestas de error
   })
 
-  const texto = await res.text()
-  let datos: unknown = texto
-  try {
-    datos = texto ? JSON.parse(texto) : null
-  } catch {
-    // la respuesta no es JSON, se muestra como texto
-  }
-
   return {
-    ok: res.ok,
+    ok: res.status >= 200 && res.status < 300,
     status: res.status,
     statusText: res.statusText,
     ms: Math.round(performance.now() - inicio),
-    datos,
+    datos: res.data === '' ? null : res.data,
   }
 }

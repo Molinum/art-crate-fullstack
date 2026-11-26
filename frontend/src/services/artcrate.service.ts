@@ -1,3 +1,4 @@
+import axios, { type AxiosError, type Method } from 'axios'
 import { API_URL } from './api.service'
 import type {
   Carrito,
@@ -24,36 +25,33 @@ const leerToken = () => {
   try { return localStorage.getItem(CLAVE_TOKEN) } catch { return null }
 }
 
-async function pedir<T>(ruta: string, metodo = 'GET', cuerpo?: unknown): Promise<T> {
-  let res: Response
+// Instancia única de Axios: los interceptores agregan el token y traducen los errores
+export const http = axios.create({ baseURL: API_URL })
+
+http.interceptors.request.use((config) => {
   const token = leerToken()
-  try {
-    res = await fetch(API_URL + ruta, {
-      method: metodo,
-      headers: {
-        ...(cuerpo !== undefined ? { 'Content-Type': 'application/json' } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: cuerpo !== undefined ? JSON.stringify(cuerpo) : undefined,
-    })
-  } catch {
-    throw new Error(MENSAJE_GENERICO)
-  }
-  const texto = await res.text()
-  const datos = texto ? JSON.parse(texto) : null
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+http.interceptors.response.use(undefined, (error: AxiosError<{ message?: string; mensaje?: string }>) => {
+  const res = error.response
+  if (!res) throw new Error(MENSAJE_GENERICO) // sin red o backend apagado
   // Token vencido o inválido: se cierra la sesión y se pide iniciar sesión de nuevo
-  if (res.status === 401 && token) {
+  if (res.status === 401 && error.config?.headers.Authorization) {
     localStorage.removeItem(CLAVE_TOKEN)
     localStorage.removeItem('artcrate.usuario')
     window.location.assign('/login')
     throw new Error('Tu sesión expiró. Inicia sesión nuevamente.')
   }
-  if (!res.ok) {
-    // los errores de validación (4xx) traen un mensaje pensado para el usuario; los 5xx no se muestran tal cual
-    const mensaje = res.status < 500 ? (datos?.message ?? datos?.mensaje) : null
-    throw new Error(mensaje ?? MENSAJE_GENERICO)
-  }
-  return datos as T
+  // los errores de validación (4xx) traen un mensaje pensado para el usuario; los 5xx no se muestran tal cual
+  const mensaje = res.status < 500 ? (res.data?.message ?? res.data?.mensaje) : null
+  throw new Error(mensaje ?? MENSAJE_GENERICO)
+})
+
+async function pedir<T>(url: string, method: Method = 'GET', data?: unknown): Promise<T> {
+  const res = await http.request<T>({ url, method, data })
+  return (res.data === '' ? null : res.data) as T // las respuestas sin cuerpo (204) llegan como texto vacío
 }
 
 export const catalogoApi = {

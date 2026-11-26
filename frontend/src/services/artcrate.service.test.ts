@@ -1,9 +1,14 @@
+import { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Carrito, Producto } from '../types'
-import { CLAVE_TOKEN, catalogoApi, pagosApi, precioCLP, productoARequest, unidadesCarrito, usuariosApi } from './artcrate.service'
+import { CLAVE_TOKEN, catalogoApi, http, pagosApi,precioCLP, productoARequest, unidadesCarrito, usuariosApi } from './artcrate.service'
 
-const respuesta = (status: number, cuerpo: unknown) =>
-  Promise.resolve(new Response(cuerpo === undefined ? '' : JSON.stringify(cuerpo), { status }))
+// Reemplaza el adaptador de Axios (la parte que sale a la red); los interceptores se ejecutan de verdad
+const respuesta = (status: number, cuerpo: unknown) => async (config: InternalAxiosRequestConfig) => {
+  const res: AxiosResponse = { data: cuerpo, status, statusText: '', headers: {}, config }
+  if (status >= 400) throw new AxiosError('error', undefined, config, null, res)
+  return res
+}
 
 describe('formatos', () => {
   it('precioCLP usa separador de miles chileno', () => {
@@ -39,49 +44,52 @@ describe('productoARequest', () => {
 })
 
 describe('llamadas a la API', () => {
-  const fetchMock = vi.fn()
+  const adaptador = vi.fn()
   const assign = vi.fn()
+  const adaptadorReal = http.defaults.adapter
+  const enviado = () => adaptador.mock.calls[0][0] as InternalAxiosRequestConfig
 
   beforeEach(() => {
-    vi.stubGlobal('fetch', fetchMock)
+    http.defaults.adapter = adaptador
     vi.stubGlobal('location', { assign })
   })
   afterEach(() => {
+    http.defaults.adapter = adaptadorReal
     vi.unstubAllGlobals()
-    fetchMock.mockReset()
+    adaptador.mockReset()
     assign.mockReset()
   })
 
   it('sin sesión no manda Authorization', async () => {
-    fetchMock.mockReturnValue(respuesta(200, []))
+    adaptador.mockImplementation(respuesta(200, []))
     await catalogoApi.categorias()
-    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBeUndefined()
+    expect(enviado().headers.Authorization).toBeUndefined()
   })
 
   it('con sesión manda el token como Bearer', async () => {
     localStorage.setItem(CLAVE_TOKEN, 'abc.def.ghi')
-    fetchMock.mockReturnValue(respuesta(200, []))
+    adaptador.mockImplementation(respuesta(200, []))
     await catalogoApi.categorias()
-    expect(fetchMock.mock.calls[0][1].headers.Authorization).toBe('Bearer abc.def.ghi')
+    expect(enviado().headers.Authorization).toBe('Bearer abc.def.ghi')
   })
 
   it('el login devuelve token y usuario', async () => {
-    fetchMock.mockReturnValue(respuesta(200, { token: 't', usuario: { id: 2 } }))
+    adaptador.mockImplementation(respuesta(200, { token: 't', usuario: { id: 2 } }))
     const r = await usuariosApi.login('a@b.cl', 'Clave1234')
     expect(r.token).toBe('t')
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ correo: 'a@b.cl', password: 'Clave1234' })
+    expect(JSON.parse(enviado().data as string)).toEqual({ correo: 'a@b.cl', password: 'Clave1234' })
   })
 
   it('pagar con tarjeta envía solo los últimos 4 dígitos', async () => {
-    fetchMock.mockReturnValue(respuesta(201, { id: 1, estado: 'APROBADO' }))
+    adaptador.mockImplementation(respuesta(201, { id: 1, estado: 'APROBADO' }))
     await pagosApi.pagar(9, 'TARJETA', '4242')
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ pedidoId: 9, metodo: 'TARJETA', ultimosDigitos: '4242' })
+    expect(JSON.parse(enviado().data as string)).toEqual({ pedidoId: 9, metodo: 'TARJETA', ultimosDigitos: '4242' })
   })
 
   it('un 401 con sesión iniciada cierra la sesión y manda a /login', async () => {
     localStorage.setItem(CLAVE_TOKEN, 'vencido')
     localStorage.setItem('artcrate.usuario', '{}')
-    fetchMock.mockReturnValue(respuesta(401, { message: 'x' }))
+    adaptador.mockImplementation(respuesta(401, { message: 'x' }))
 
     await expect(catalogoApi.categorias()).rejects.toThrow(/sesión expiró/i)
 
@@ -91,23 +99,23 @@ describe('llamadas a la API', () => {
   })
 
   it('un 401 sin sesión (login fallido) muestra el mensaje del servidor y no redirige', async () => {
-    fetchMock.mockReturnValue(respuesta(401, { message: 'Correo o contraseña incorrectos' }))
+    adaptador.mockImplementation(respuesta(401, { message: 'Correo o contraseña incorrectos' }))
     await expect(usuariosApi.login('a@b.cl', 'mala')).rejects.toThrow('Correo o contraseña incorrectos')
     expect(assign).not.toHaveBeenCalled()
   })
 
   it('los errores 4xx muestran el mensaje del servidor', async () => {
-    fetchMock.mockReturnValue(respuesta(409, { message: 'El pedido no está pendiente de pago' }))
+    adaptador.mockImplementation(respuesta(409, { message: 'El pedido no está pendiente de pago' }))
     await expect(pagosApi.pagar(1, 'TRANSFERENCIA')).rejects.toThrow('El pedido no está pendiente de pago')
   })
 
   it('los errores 5xx muestran un mensaje genérico, sin detalles internos', async () => {
-    fetchMock.mockReturnValue(respuesta(500, { message: 'NullPointerException en PedidoService' }))
+    adaptador.mockImplementation(respuesta(500, { message: 'NullPointerException en PedidoService' }))
     await expect(catalogoApi.categorias()).rejects.toThrow(/Ocurrió un problema/)
   })
 
   it('si no hay red muestra el mensaje genérico', async () => {
-    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'))
+    adaptador.mockRejectedValue(new AxiosError('Network Error', 'ERR_NETWORK'))
     await expect(catalogoApi.categorias()).rejects.toThrow(/Ocurrió un problema/)
   })
 })
