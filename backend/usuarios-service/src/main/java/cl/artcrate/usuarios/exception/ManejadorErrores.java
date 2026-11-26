@@ -38,6 +38,11 @@ public class ManejadorErrores extends ResponseEntityExceptionHandler {
         return responder(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(ProhibidoException.class)
+    public ResponseEntity<Object> prohibido(ProhibidoException ex) {
+        return responder(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
     @ExceptionHandler(ConflictoException.class)
     public ResponseEntity<Object> conflicto(ConflictoException ex) {
         return responder(HttpStatus.CONFLICT, ex.getMessage());

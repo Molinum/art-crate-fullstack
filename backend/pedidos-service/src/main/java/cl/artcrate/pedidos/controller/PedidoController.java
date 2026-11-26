@@ -51,7 +51,9 @@ public class PedidoController {
     @GetMapping("/{id}")
     public PedidoResponse obtener(@PathVariable Long id, HttpServletRequest req) {
         PedidoResponse pedido = service.obtener(id);
-        exigirPropio(req, pedido.usuarioId());
+        if (!"ENCARGADO".equals(req.getAttribute(FiltroJwt.ATRIBUTO_ROL))) {
+            exigirPropio(req, pedido.usuarioId());
+        }
         return pedido;
     }
 

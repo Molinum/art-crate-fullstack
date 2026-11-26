@@ -7,6 +7,7 @@ import cl.artcrate.usuarios.dto.RegistroRequest;
 import cl.artcrate.usuarios.dto.UsuarioResponse;
 import cl.artcrate.usuarios.exception.ConflictoException;
 import cl.artcrate.usuarios.exception.CredencialesInvalidasException;
+import cl.artcrate.usuarios.exception.ProhibidoException;
 import cl.artcrate.usuarios.exception.RecursoNoEncontradoException;
 import cl.artcrate.usuarios.model.Rol;
 import cl.artcrate.usuarios.model.Usuario;
@@ -66,8 +67,13 @@ public class UsuarioService {
         return aRespuesta(buscar(id));
     }
 
-    public UsuarioResponse actualizar(Long id, ActualizarUsuarioRequest datos) {
+    public UsuarioResponse actualizar(Long id, ActualizarUsuarioRequest datos, Long solicitanteId) {
         Usuario usuario = buscar(id);
+        boolean cambiaAcceso = (datos.rol() != null && datos.rol() != usuario.getRol())
+                || (datos.activo() != null && datos.activo() != usuario.isActivo());
+        if (cambiaAcceso) {
+            exigirPuedeCambiarAcceso(id, solicitanteId);
+        }
         usuario.setNombre(datos.nombre().trim());
         usuario.setApellido(datos.apellido().trim());
         usuario.setTelefono(datos.telefono());
@@ -89,6 +95,23 @@ public class UsuarioService {
     }
 
     // ----- métodos de apoyo -----
+
+    /**
+     * Rol y estado solo los cambia un administrador activo, y nunca sobre su propia cuenta:
+     * así siempre queda al menos un administrador. Se consulta la base y no solo el token,
+     * porque un token emitido antes de quitarle el rol sigue diciendo ADMIN hasta que vence.
+     */
+    private void exigirPuedeCambiarAcceso(Long usuarioId, Long solicitanteId) {
+        boolean esAdmin = repository.findById(solicitanteId)
+                .map(s -> s.getRol() == Rol.ADMIN && s.isActivo())
+                .orElse(false);
+        if (!esAdmin) {
+            throw new ProhibidoException("Solo un administrador puede cambiar roles o desactivar usuarios");
+        }
+        if (usuarioId.equals(solicitanteId)) {
+            throw new ConflictoException("No puedes cambiar tu propio rol ni desactivar tu cuenta");
+        }
+    }
 
     private Usuario buscar(Long id) {
         return repository.findById(id)

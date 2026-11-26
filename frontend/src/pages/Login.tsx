@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ErrorApi } from '../components/Estado'
 import { useSesion } from '../context/SesionContext'
+import { esPersonal } from '../data/negocio'
 import { usuariosApi } from '../services/artcrate.service'
 
 export function Login() {
@@ -20,7 +21,7 @@ export function Login() {
     try {
       const { token, usuario } = await usuariosApi.login(correo, password)
       iniciar(usuario, token)
-      navegar(usuario.rol === 'ADMIN' ? '/admin' : '/') // el administrador entra directo a su panel
+      navegar(esPersonal(usuario.rol) ? '/admin' : '/') // el personal de la tienda entra directo al panel
     } catch (err) {
       setError((err as Error).message)
     }

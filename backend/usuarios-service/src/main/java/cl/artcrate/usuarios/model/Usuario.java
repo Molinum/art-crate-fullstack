@@ -8,6 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /** Entidad que se guarda en la tabla "usuarios". */
 @Entity
@@ -36,8 +38,10 @@ public class Usuario {
 
     private String region;
 
+    // Como texto y no como ENUM de MySQL, para poder agregar roles sin cambiar la columna
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(nullable = false, length = 20)
     private Rol rol;
 
     @Column(nullable = false)

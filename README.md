@@ -42,6 +42,7 @@ El backend los crea la primera vez que arranca:
 
 - Administrador: `admin@artcrate.cl` / `Admin123`
 - Cliente: `cliente@artcrate.cl` / `Cliente123`
+- Encargado de tienda: `encargado@artcrate.cl` / `Encargado123`
 
 ## Más información
 

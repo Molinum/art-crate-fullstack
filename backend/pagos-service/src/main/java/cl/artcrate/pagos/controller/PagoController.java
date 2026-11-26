@@ -42,17 +42,22 @@ public class PagoController {
     @Operation(summary = "Obtener un pago por id")
     @GetMapping("/{id}")
     public PagoResponse obtener(@PathVariable Long id, HttpServletRequest req) {
-        return service.obtener(id, usuario(req), privilegiado(req));
+        return service.obtener(id, usuario(req), puedeVer(req));
     }
 
     @Operation(summary = "Listar los pagos de un pedido")
     @GetMapping("/pedido/{pedidoId}")
     public List<PagoResponse> listarPorPedido(@PathVariable Long pedidoId, HttpServletRequest req) {
-        return service.listarPorPedido(pedidoId, usuario(req), privilegiado(req));
+        return service.listarPorPedido(pedidoId, usuario(req), puedeVer(req));
     }
 
     private String usuario(HttpServletRequest req) {
         return (String) req.getAttribute(FiltroJwt.ATRIBUTO_USUARIO);
+    }
+
+    /** Para consultar (no para pagar), el encargado de tienda ve los pagos de cualquier pedido. */
+    private boolean puedeVer(HttpServletRequest req) {
+        return privilegiado(req) || "ENCARGADO".equals(req.getAttribute(FiltroJwt.ATRIBUTO_ROL));
     }
 
     private boolean privilegiado(HttpServletRequest req) {

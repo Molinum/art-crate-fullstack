@@ -17,6 +17,7 @@ import cl.artcrate.usuarios.dto.RegistroRequest;
 import cl.artcrate.usuarios.dto.UsuarioResponse;
 import cl.artcrate.usuarios.exception.ConflictoException;
 import cl.artcrate.usuarios.exception.CredencialesInvalidasException;
+import cl.artcrate.usuarios.exception.ProhibidoException;
 import cl.artcrate.usuarios.exception.RecursoNoEncontradoException;
 import cl.artcrate.usuarios.model.Rol;
 import cl.artcrate.usuarios.model.Usuario;
@@ -171,7 +172,7 @@ class UsuarioServiceTest {
         when(repository.findById(5L)).thenReturn(Optional.of(guardado("ana@correo.cl", "Clave1234", true, Rol.ADMIN)));
         when(repository.save(any(Usuario.class))).thenAnswer(i -> i.getArgument(0));
 
-        UsuarioResponse r = service.actualizar(5L, new ActualizarUsuarioRequest(" Nueva ", "Pérez", null, "Biobío", null, null));
+        UsuarioResponse r = service.actualizar(5L, new ActualizarUsuarioRequest(" Nueva ", "Pérez", null, "Biobío", null, null), 5L);
 
         assertEquals("Nueva", r.nombre());
         assertEquals(Rol.ADMIN, r.rol());
@@ -181,12 +182,38 @@ class UsuarioServiceTest {
     @Test
     @DisplayName("actualizar puede cambiar el rol y desactivar al usuario")
     void actualizarRolYActivo() {
+        Usuario admin = guardado("admin@correo.cl", "Clave1234", true, Rol.ADMIN);
+        admin.setId(1L);
+        when(repository.findById(1L)).thenReturn(Optional.of(admin));
         when(repository.findById(5L)).thenReturn(Optional.of(guardado("ana@correo.cl", "Clave1234", true, Rol.CLIENTE)));
         when(repository.save(any(Usuario.class))).thenAnswer(i -> i.getArgument(0));
 
-        UsuarioResponse r = service.actualizar(5L, new ActualizarUsuarioRequest("Ana", "Pérez", null, null, Rol.ADMIN, false));
+        UsuarioResponse r = service.actualizar(5L, new ActualizarUsuarioRequest("Ana", "Pérez", null, null, Rol.ADMIN, false), 1L);
 
         assertEquals(Rol.ADMIN, r.rol());
         assertFalse(r.activo());
+    }
+
+    @Test
+    @DisplayName("un administrador no puede cambiar su propio rol")
+    void noCambiaSuPropioRol() {
+        when(repository.findById(5L)).thenReturn(Optional.of(guardado("ana@correo.cl", "Clave1234", true, Rol.ADMIN)));
+
+        assertThrows(ConflictoException.class, () -> service.actualizar(5L,
+                new ActualizarUsuarioRequest("Ana", "Pérez", null, null, Rol.CLIENTE, null), 5L));
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("quien ya no es administrador no puede cambiar roles, aunque conserve un token antiguo")
+    void sinRolEnLaBaseNoCambiaRoles() {
+        Usuario exAdmin = guardado("ex@correo.cl", "Clave1234", true, Rol.ENCARGADO);
+        exAdmin.setId(7L);
+        when(repository.findById(5L)).thenReturn(Optional.of(guardado("ana@correo.cl", "Clave1234", true, Rol.CLIENTE)));
+        when(repository.findById(7L)).thenReturn(Optional.of(exAdmin));
+
+        assertThrows(ProhibidoException.class, () -> service.actualizar(5L,
+                new ActualizarUsuarioRequest("Ana", "Pérez", null, null, Rol.ADMIN, null), 7L));
+        verify(repository, never()).save(any());
     }
 }

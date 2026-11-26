@@ -84,6 +84,10 @@ public class FiltroJwt extends OncePerRequestFilter {
     private boolean permitido(String metodo, String ruta, String usuarioId, String rol) {
         boolean privilegiado = "ADMIN".equals(rol) || "SERVICIO".equals(rol);
         if (privilegiado) return true;
+        // El encargado revisa todos los pedidos y cambia su estado
+        if ("ENCARGADO".equals(rol) && ("GET".equals(metodo) || ("PATCH".equals(metodo) && ruta.matches("^/api/pedidos/\\d+/estado$")))) {
+            return true;
+        }
         // Listar todos y cambiar estados es del administrador. Crear y ver un pedido se permiten a cualquier
         // usuario con sesión; que el pedido sea suyo lo comprueba el controlador.
         if ("POST".equals(metodo) && ruta.equals("/api/pedidos")) return true;

@@ -82,7 +82,7 @@ public class FiltroJwt extends OncePerRequestFilter {
 
     private boolean permitido(String metodo, String ruta, String usuarioId, String rol) {
         boolean privilegiado = "ADMIN".equals(rol) || "SERVICIO".equals(rol);
-        return privilegiado; // fijar, descontar y reponer stock: administrador o servicios internos
+        return privilegiado || "ENCARGADO".equals(rol); // fijar, descontar y reponer stock: personal o servicios internos
     }
 
     private Claims leerToken(String cabecera) {

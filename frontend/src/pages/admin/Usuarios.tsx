@@ -5,6 +5,7 @@ import { useConfirmar } from '../../components/admin/useConfirmar'
 import { BarraFiltros } from '../../components/admin/BarraFiltros'
 import { Cargando, ErrorApi } from '../../components/Estado'
 import { useSesion } from '../../context/SesionContext'
+import { ETIQUETA_ROL } from '../../data/negocio'
 import { useApi } from '../../hooks'
 import { pedidosApi, usuariosApi } from '../../services/artcrate.service'
 import type { Usuario } from '../../types'
@@ -12,9 +13,19 @@ import type { Usuario } from '../../types'
 const FILTROS = [
   { clave: '', texto: 'Todos' },
   { clave: 'ADMIN', texto: 'Administradores' },
+  { clave: 'ENCARGADO', texto: 'Encargados' },
   { clave: 'CLIENTE', texto: 'Clientes' },
   { clave: 'INACTIVOS', texto: 'Desactivados' },
 ]
+
+const ROLES: Usuario['rol'][] = ['CLIENTE', 'ENCARGADO', 'ADMIN']
+
+// Qué podrá hacer la persona con cada rol (se muestra antes de confirmar el cambio)
+const ALCANCE: Record<Usuario['rol'], string> = {
+  CLIENTE: 'solo podrá comprar y ver sus propios pedidos',
+  ENCARGADO: 'podrá gestionar productos, categorías, stock y pedidos, pero no usuarios',
+  ADMIN: 'podrá gestionar todo, incluidos los usuarios y tu propio acceso',
+}
 
 export function Usuarios() {
   const { usuario: yo } = useSesion()
@@ -48,6 +59,14 @@ export function Usuarios() {
     }
   }
 
+  const cambiarRol = (u: Usuario, rol: Usuario['rol']) =>
+    cambiar(u, { rol }, `${u.nombre} ahora es ${ETIQUETA_ROL[rol].toLowerCase()}.`, {
+      titulo: 'Cambiar rol',
+      mensaje: `${u.nombre} (${u.correo}) pasará a ser ${ETIQUETA_ROL[rol].toLowerCase()}: ${ALCANCE[rol]}.`,
+      boton: 'Cambiar rol',
+      peligro: rol === 'ADMIN' || u.rol === 'ADMIN',
+    })
+
   return (
     <>
       <h1 className="mb-2">Usuarios</h1>
@@ -79,22 +98,21 @@ export function Usuarios() {
                     <td className="celda-principal fw-semibold">{u.nombre} {u.apellido}{esYo && <span className="badge text-bg-light border ms-2">Tú</span>}</td>
                     <td data-label="Correo">{u.correo}</td>
                     <td data-label="Región">{u.region ?? '—'}</td>
-                    <td data-label="Rol"><span className={`badge ${u.rol === 'ADMIN' ? 'text-bg-dark' : 'text-bg-light border'}`}>{u.rol === 'ADMIN' ? 'Administrador' : 'Cliente'}</span></td>
+                    <td data-label="Rol">
+                      {esYo ? <span className="badge text-bg-dark">{ETIQUETA_ROL[u.rol]}</span> : (
+                        <select
+                          className="form-select form-select-sm w-auto" aria-label={`Rol de ${u.nombre} ${u.apellido}`} value={u.rol}
+                          onChange={(e) => cambiarRol(u, e.target.value as Usuario['rol'])}
+                        >
+                          {ROLES.map((r) => <option key={r} value={r}>{ETIQUETA_ROL[r]}</option>)}
+                        </select>
+                      )}
+                    </td>
                     <td data-label="Pedidos" className="text-end">{cantidadPedidos(u.id)}</td>
                     <td data-label="Estado"><span className={`badge ${u.activo ? 'text-bg-success' : 'text-bg-secondary'}`}>{u.activo ? 'Activo' : 'Desactivado'}</span></td>
                     <td className="celda-acciones text-nowrap text-end">
                       {esYo ? <span className="small text-secondary">Tu cuenta no se edita aquí</span> : (
                         <>
-                          <button
-                            className="btn btn-sm btn-outline-secondary me-2"
-                            onClick={() => cambiar(u, { rol: u.rol === 'ADMIN' ? 'CLIENTE' : 'ADMIN' },
-                              `${u.nombre} ahora es ${u.rol === 'ADMIN' ? 'cliente' : 'administrador'}.`,
-                              u.rol === 'ADMIN'
-                                ? { titulo: 'Quitar rol de administrador', mensaje: `${u.nombre} dejará de entrar al panel.`, boton: 'Quitar rol', peligro: true }
-                                : { titulo: 'Dar acceso de administrador', mensaje: `${u.nombre} (${u.correo}) podrá cambiar productos, pedidos y usuarios, incluido tu acceso.`, boton: 'Hacer administrador', peligro: true })}
-                          >
-                            {u.rol === 'ADMIN' ? 'Hacer cliente' : 'Hacer admin'}
-                          </button>
                           <button
                             className={`btn btn-sm ${u.activo ? 'btn-outline-danger' : 'btn-outline-success'}`}
                             onClick={() => cambiar(u, { activo: !u.activo }, `${u.nombre} quedó ${u.activo ? 'desactivado' : 'activo'}.`,

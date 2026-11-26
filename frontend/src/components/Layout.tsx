@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useCarrito } from '../context/CarritoContext'
 import { useSesion } from '../context/SesionContext'
+import { esPersonal } from '../data/negocio'
 
 export function Layout() {
   const { usuario, cerrar } = useSesion()
@@ -38,7 +39,7 @@ export function Layout() {
                 {usuario ? (
                   <>
                     <li className="nav-item"><NavLink className="nav-link" to="/pedidos">Mis pedidos</NavLink></li>
-                    {usuario.rol === 'ADMIN' && (
+                    {esPersonal(usuario.rol) && (
                       <li className="nav-item"><NavLink className="nav-link" to="/admin">Administración</NavLink></li>
                     )}
                     <li className="nav-item">

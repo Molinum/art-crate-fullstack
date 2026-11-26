@@ -84,6 +84,8 @@ public class FiltroJwt extends OncePerRequestFilter {
     private boolean permitido(String metodo, String ruta, String usuarioId, String rol) {
         boolean privilegiado = "ADMIN".equals(rol) || "SERVICIO".equals(rol);
         if (privilegiado) return true;
+        // El encargado ve los usuarios (necesita el nombre y contacto de quien compra), pero no los modifica
+        if ("ENCARGADO".equals(rol) && "GET".equals(metodo) && ruta.startsWith("/api/usuarios")) return true;
         // Un cliente solo puede ver SU usuario; listar y editar usuarios es del administrador
         Matcher m = PROPIO.matcher(ruta);
         return "GET".equals(metodo) && m.matches() && m.group(1).equals(usuarioId);

@@ -74,7 +74,16 @@ class FiltroJwtTest {
         "cliente no cambia estados        | PATCH   | /api/pedidos/5/estado     | CLIENTE:2  | 403",
         "admin cambia estados             | PATCH   | /api/pedidos/5/estado     | ADMIN:1    | 200",
         "cliente paga                     | POST    | /api/pagos                | CLIENTE:2  | 200",
-        "pagar sin token                  | POST    | /api/pagos                | -          | 401"
+        "pagar sin token                  | POST    | /api/pagos                | -          | 401",
+        "encargado crea productos         | POST    | /api/productos            | ENCARGADO:3| 200",
+        "encargado fija stock             | PUT     | /api/inventario/3         | ENCARGADO:3| 200",
+        "encargado lista pedidos          | GET     | /api/pedidos              | ENCARGADO:3| 200",
+        "encargado cambia estados         | PATCH   | /api/pedidos/5/estado     | ENCARGADO:3| 200",
+        "encargado consulta usuarios      | GET     | /api/usuarios             | ENCARGADO:3| 200",
+        "encargado no cambia usuarios     | PUT     | /api/usuarios/2           | ENCARGADO:3| 403",
+        "encargado no se cambia el rol    | PUT     | /api/usuarios/3           | ENCARGADO:3| 403",
+        "encargado no ve carritos ajenos  | GET     | /api/carritos/2           | ENCARGADO:3| 403",
+        "encargado ve su carrito          | GET     | /api/carritos/3           | ENCARGADO:3| 200"
     })
     @DisplayName("permisos por ruta y rol")
     void permisos(String caso, String metodo, String ruta, String quien, int esperado) {

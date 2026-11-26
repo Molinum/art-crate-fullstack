@@ -1,6 +1,11 @@
-import type { EstadoPedido } from '../types'
+import type { EstadoPedido, Rol } from '../types'
 
 // Reglas de negocio compartidas por las vistas de cliente y de administración
+
+export const ETIQUETA_ROL: Record<Rol, string> = { ADMIN: 'Administrador', ENCARGADO: 'Encargado de tienda', CLIENTE: 'Cliente' }
+
+// Quienes entran al panel; la gestión de usuarios es solo del administrador
+export const esPersonal = (rol: Rol) => rol === 'ADMIN' || rol === 'ENCARGADO'
 
 export const STOCK_BAJO = 5 // desde esta cantidad hacia abajo se avisa "stock bajo"
 

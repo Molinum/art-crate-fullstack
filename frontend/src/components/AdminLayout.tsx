@@ -1,15 +1,19 @@
 import { useState } from 'react'
-import { Link, NavLink, Navigate, Outlet, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useSesion } from '../context/SesionContext'
+import { esPersonal } from '../data/negocio'
 
-// Panel de administración: solo para usuarios con rol ADMIN (el backend además valida el rol del token)
+// Panel de la tienda: administrador y encargado. Usuarios es solo del administrador (el backend además valida el rol)
 export function AdminLayout() {
   const { usuario, cerrar } = useSesion()
   const navegar = useNavigate()
+  const { pathname } = useLocation()
   const [saliendo, setSaliendo] = useState(false) // true mientras el admin cierra sesión y vuelve a la tienda
   const [menuAbierto, setMenuAbierto] = useState(false) // solo se usa en pantallas angostas
   if (!usuario) return saliendo ? null : <Navigate to="/login" replace />
-  if (usuario.rol !== 'ADMIN') return <Navigate to="/" replace />
+  if (!esPersonal(usuario.rol)) return <Navigate to="/" replace />
+  const esAdmin = usuario.rol === 'ADMIN'
+  if (!esAdmin && pathname.startsWith('/admin/usuarios')) return <Navigate to="/admin" replace />
 
   return (
     <>
@@ -31,7 +35,7 @@ export function AdminLayout() {
               <li className="nav-item"><NavLink className="nav-link" to="/admin/productos">Productos</NavLink></li>
               <li className="nav-item"><NavLink className="nav-link" to="/admin/categorias">Categorías</NavLink></li>
               <li className="nav-item"><NavLink className="nav-link" to="/admin/pedidos">Pedidos</NavLink></li>
-              <li className="nav-item"><NavLink className="nav-link" to="/admin/usuarios">Usuarios</NavLink></li>
+              {esAdmin && <li className="nav-item"><NavLink className="nav-link" to="/admin/usuarios">Usuarios</NavLink></li>}
               <li className="nav-item"><Link className="nav-link" to="/">Ver tienda</Link></li>
               <li className="nav-item">
                 <button className="nav-link" onClick={() => { setSaliendo(true); navegar('/'); cerrar() }}>Salir ({usuario.nombre})</button>

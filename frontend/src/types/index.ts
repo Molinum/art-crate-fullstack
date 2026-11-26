@@ -21,7 +21,7 @@ export interface Producto {
   activo: boolean
 }
 
-export type Rol = 'ADMIN' | 'CLIENTE'
+export type Rol = 'ADMIN' | 'ENCARGADO' | 'CLIENTE'
 
 export interface Usuario {
   id: number

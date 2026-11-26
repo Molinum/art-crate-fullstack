@@ -57,8 +57,8 @@ public class FiltroJwt implements GlobalFilter, Ordered {
         if (claims == null) {
             return rechazar(exchange, HttpStatus.UNAUTHORIZED, "Debes iniciar sesión para continuar");
         }
-        boolean admin = "ADMIN".equals(claims.get("rol", String.class));
-        if (!tienePermiso(metodo, ruta, claims.getSubject(), admin)) {
+        String rol = claims.get("rol", String.class);
+        if (!tienePermiso(metodo, ruta, claims.getSubject(), rol)) {
             return rechazar(exchange, HttpStatus.FORBIDDEN, "No tienes permiso para realizar esta acción");
         }
 
@@ -74,8 +74,10 @@ public class FiltroJwt implements GlobalFilter, Ordered {
         return lectura && (ruta.startsWith("/api/productos") || ruta.startsWith("/api/categorias") || ruta.startsWith("/api/inventario"));
     }
 
-    private boolean tienePermiso(HttpMethod metodo, String ruta, String usuarioId, boolean admin) {
-        if (admin) return true;
+    private boolean tienePermiso(HttpMethod metodo, String ruta, String usuarioId, String rol) {
+        if ("ADMIN".equals(rol)) return true;
+        if ("ENCARGADO".equals(rol) && esDeLaTienda(metodo, ruta)) return true;
+        // El resto de las reglas valen para cualquier usuario con sesión (también el encargado, como comprador)
         // Un cliente solo puede ver SU usuario, SU carrito y SUS pedidos
         var coincidencia = ID_EN_RUTA.matcher(ruta);
         if (coincidencia.matches()) {
@@ -88,6 +90,16 @@ public class FiltroJwt implements GlobalFilter, Ordered {
         if (HttpMethod.GET.equals(metodo) && (ruta.matches("^/api/pedidos/\\d+$") || ruta.startsWith("/api/pagos/"))) return true;
         // Todo lo demás (listar usuarios y pedidos, editar catálogo e inventario, cambiar estados) es solo del administrador
         return false;
+    }
+
+    /** Lo que además puede hacer el encargado: catálogo, stock, pedidos y consultar usuarios y pagos. */
+    private boolean esDeLaTienda(HttpMethod metodo, String ruta) {
+        boolean lectura = HttpMethod.GET.equals(metodo);
+        if (ruta.startsWith("/api/productos") || ruta.startsWith("/api/categorias") || ruta.startsWith("/api/inventario")) return true;
+        if (ruta.startsWith("/api/pedidos")) {
+            return lectura || (HttpMethod.PATCH.equals(metodo) && ruta.matches("^/api/pedidos/\\d+/estado$"));
+        }
+        return lectura && (ruta.startsWith("/api/usuarios") || ruta.startsWith("/api/pagos"));
     }
 
     private Claims leerToken(String cabecera) {

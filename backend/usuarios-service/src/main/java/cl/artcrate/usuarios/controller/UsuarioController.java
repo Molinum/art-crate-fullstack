@@ -5,9 +5,11 @@ import cl.artcrate.usuarios.dto.LoginRequest;
 import cl.artcrate.usuarios.dto.LoginResponse;
 import cl.artcrate.usuarios.dto.RegistroRequest;
 import cl.artcrate.usuarios.dto.UsuarioResponse;
+import cl.artcrate.usuarios.seguridad.FiltroJwt;
 import cl.artcrate.usuarios.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -60,8 +62,11 @@ public class UsuarioController {
 
     @Operation(summary = "Actualizar los datos de un usuario")
     @PutMapping("/{id}")
-    public UsuarioResponse actualizar(@PathVariable Long id, @Valid @RequestBody ActualizarUsuarioRequest datos) {
-        return service.actualizar(id, datos);
+    public UsuarioResponse actualizar(@PathVariable Long id, @Valid @RequestBody ActualizarUsuarioRequest datos,
+                                      HttpServletRequest req) {
+        // quién pide el cambio sale del token, nunca del cuerpo de la petición
+        Long solicitante = Long.valueOf((String) req.getAttribute(FiltroJwt.ATRIBUTO_USUARIO));
+        return service.actualizar(id, datos, solicitante);
     }
 
     @Operation(summary = "Eliminar un usuario (no permitido)",

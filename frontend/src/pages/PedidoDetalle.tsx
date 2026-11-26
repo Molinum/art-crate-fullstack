@@ -4,6 +4,7 @@ import { DetallePedido } from '../components/DetallePedido'
 import { Cargando, ErrorApi } from '../components/Estado'
 import { FormularioPago } from '../components/FormularioPago'
 import { useSesion } from '../context/SesionContext'
+import { esPersonal } from '../data/negocio'
 import { useApi } from '../hooks'
 import { pagosApi, pedidosApi } from '../services/artcrate.service'
 import type { MetodoPago } from '../types'
@@ -28,7 +29,7 @@ export function PedidoDetalle() {
   }
 
   const p = pedido.datos
-  if (p.usuarioId !== usuario.id && usuario.rol !== 'ADMIN') {
+  if (p.usuarioId !== usuario.id && !esPersonal(usuario.rol)) {
     return <div className="container py-5"><ErrorApi mensaje="No tienes acceso a este pedido." /></div>
   }
 
@@ -85,7 +86,7 @@ export function PedidoDetalle() {
 
       <DetallePedido pedido={p} pago={pago} />
 
-      {p.estado === 'PENDIENTE_PAGO' && (
+      {p.estado === 'PENDIENTE_PAGO' && (p.usuarioId === usuario.id || usuario.rol === 'ADMIN') && (
         <>
           <FormularioPago pedidoId={p.id} total={p.total} procesando={procesando} onPagar={pagar} />
           {rechazados.length > 0 && (

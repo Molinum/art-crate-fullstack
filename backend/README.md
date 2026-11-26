@@ -72,7 +72,16 @@ Para levantar un servicio por separado, entrar a su carpeta y ejecutar `mvn spri
 
 Se cargan la primera vez que arranca cada servicio, si las tablas están vacías.
 
-- Usuarios: `admin@artcrate.cl` / `Admin123` (ADMIN) y `cliente@artcrate.cl` / `Cliente123` (CLIENTE, id 2).
+- Usuarios: `admin@artcrate.cl` / `Admin123` (ADMIN), `cliente@artcrate.cl` / `Cliente123` (CLIENTE, id 2) y `encargado@artcrate.cl` / `Encargado123` (ENCARGADO).
+
+## Roles
+
+| Puede | CLIENTE | ENCARGADO | ADMIN |
+|---|---|---|---|
+| Comprar y ver sus propios pedidos | sí | sí | sí |
+| Gestionar productos, categorías, stock y estados de pedidos | no | sí | sí |
+| Ver usuarios, y pedidos y pagos de otros | no | sí | sí |
+| Cambiar roles y desactivar usuarios (nunca la propia cuenta) | no | no | sí |
 - Catálogo: 5 categorías y 48 productos (ids 1 a 48), con precios en CLP y ficha técnica (marca, formato y contenido). Los 22 que tienen foto quedan activos y el resto desactivado. Si la base es de una versión anterior, al arrancar se actualiza.
 - Inventario: stock para los productos 1 a 48.
 
