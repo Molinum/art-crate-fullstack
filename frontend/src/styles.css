@@ -437,6 +437,9 @@ header .admin-navbar .nav-link.active { background: var(--ac-terracota); color: 
 /* Carrito en pantallas angostas (bajo 992 px, donde la tabla de 760 px ya no cabe): tarjetas apiladas, sin scroll horizontal */
 @media (max-width: 991px) {
   .tabla-carrito { min-width: 0; display: block; }
+  /* la tarjeta es blanca y las celdas transparentes: si cada celda pinta su propio blanco, entre ellas se ve el fondo crema */
+  .table.tabla-carrito { background: #fff; }
+  .tabla-carrito.table > tbody > tr > td, .tabla-carrito.table > tfoot > tr > th { background: transparent; box-shadow: none; }
   .tabla-carrito colgroup, .tabla-carrito thead, .tabla-carrito .carrito-vacio { display: none; }
   .tabla-carrito tbody, .tabla-carrito tfoot { display: block; }
   .tabla-carrito tbody tr {
