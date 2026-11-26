@@ -6,7 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** Carga el stock de los productos 1..30 del catálogo al arrancar. Solo crea los que aún no tienen stock. */
+/** Carga el stock de los productos 1..48 del catálogo al arrancar. Solo crea los que aún no tienen stock. */
 @Configuration
 public class DatosIniciales {
 
@@ -16,7 +16,8 @@ public class DatosIniciales {
             // Posición en el arreglo = id del producto - 1
             int[] cantidades = {
                     25, 14, 8, 40, 30, 15, 32, 22, 18, 20, 6, 10,
-                    18, 22, 16, 30, 28, 12, 45, 20, 25, 18, 14, 10, 35, 26, 18, 9, 7, 5};
+                    18, 22, 16, 30, 28, 12, 45, 20, 25, 18, 14, 10, 35, 26, 18, 9, 7, 5,
+                    14, 12, 30, 15, 25, 28, 10, 20, 18, 22, 16, 12, 20, 14, 25, 18, 5, 12};
             for (int i = 0; i < cantidades.length; i++) {
                 long productoId = i + 1;
                 if (!repository.existsById(productoId)) {

@@ -73,8 +73,8 @@ Para levantar un servicio por separado, entrar a su carpeta y ejecutar `mvn spri
 Se cargan la primera vez que arranca cada servicio, si las tablas están vacías.
 
 - Usuarios: `admin@artcrate.cl` / `Admin123` (ADMIN) y `cliente@artcrate.cl` / `Cliente123` (CLIENTE, id 2).
-- Catálogo: 5 categorías y 30 productos (ids 1 a 30), con precios en CLP y ficha técnica (marca, formato y contenido). Si la base ya tenía los 12 productos originales, al arrancar se les completa la ficha y se agregan los 18 nuevos.
-- Inventario: stock para los productos 1 a 30.
+- Catálogo: 5 categorías y 48 productos (ids 1 a 48), con precios en CLP y ficha técnica (marca, formato y contenido). Los 22 que tienen foto quedan activos y el resto desactivado. Si la base es de una versión anterior, al arrancar se actualiza.
+- Inventario: stock para los productos 1 a 48.
 
 ## Endpoints
 

@@ -16,9 +16,32 @@ const IMAGENES = [
   'producto-22-lienzo-50x70', 'producto-23-block-dibujo-a3', 'producto-24-papel-kraft-rollo',
   'producto-25-paleta-de-mezcla', 'producto-26-espatulas-x5', 'producto-27-atril-de-pie',
   'producto-28-kit-acuarela-viajero', 'producto-29-kit-dibujo-profesional', 'producto-30-kit-oleo-principiante',
-].map((n) => `assets/img/${n}.svg`)
+].map((n) => `assets/img/${n}.svg`).concat([
+  'sakura-sketchbook-13x21.webp',
+  'liquitex-basics-metalicos-x6.avif',
+  'staedtler-mars-micro-05.webp',
+  'royal-langnickel-espatulas-x5.jpg',
+  'winsor-newton-winton-10.webp',
+  'liquitex-basics-iridiscentes-x6.avif',
+  'winsor-newton-grafito-6.webp',
+  'staedtler-brush-36.webp',
+  'staedtler-mars-technico-2mm.jpg',
+  'winsor-newton-colores-12.webp',
+  'faber-castell-pitt-pastel-24.jpg',
+  'rohrer-klingner-sketchink-klara.webp',
+  'canson-xl-croquis-a3.jpg',
+  'canson-montval-300.webp',
+  'canson-xl-mix-media-a3.webp',
+  'fredrix-black-canvas-pad.png',
+  'fredrix-red-label-23x30.webp',
+  'fredrix-watercolor-23x30.jpg',
+  'fredrix-redondo-127.jpg',
+  'sakura-sketchbook-negro-12x12.webp',
+  'winsor-newton-studio-case.webp',
+  'winsor-newton-cotman-bolsillo.webp',
+].map((n) => `assets/img/productos/${n}`))
 
-const VACIO = { sku: '', nombre: '', descripcion: '', precio: '', marca: '', formato: '', contenido: '', imagenUrl: 'assets/img/producto-01-acrilico-12-colores.svg', categoriaId: '', stock: '0', activo: true }
+const VACIO = { sku: '', nombre: '', descripcion: '', precio: '', marca: '', formato: '', contenido: '', imagenUrl: 'assets/img/productos/winsor-newton-winton-10.webp', categoriaId: '', stock: '0', activo: true }
 
 export function ProductoForm() {
   const { id } = useParams()
@@ -95,7 +118,7 @@ export function ProductoForm() {
             <label className="form-label" htmlFor="imagen">Imagen</label>
             <select id="imagen" className="form-select" value={f.imagenUrl} onChange={set('imagenUrl')}>
               {!IMAGENES.includes(f.imagenUrl) && <option value={f.imagenUrl}>{f.imagenUrl}</option>}
-              {IMAGENES.map((i) => <option key={i} value={i}>{i.replace('assets/img/', '').replace('.svg', '')}</option>)}
+              {IMAGENES.map((i) => <option key={i} value={i}>{i.replace(/^.*\//, '').replace(/\.\w+$/, '')}</option>)}
             </select>
           </div>
           <div className="col-md-4">

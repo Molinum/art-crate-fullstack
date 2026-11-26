@@ -4,13 +4,13 @@ import { TarjetaProducto } from '../components/TarjetaProducto'
 import { useApi } from '../hooks'
 import { catalogoApi } from '../services/artcrate.service'
 
-// Imagen de cada categoría según su posición (ids 1..5 del backend)
+// Foto de un producto representativo para cada categoría, según su nombre
 const IMAGENES_CATEGORIA: Record<string, string> = {
-  Pintura: 'categoria-pintura',
-  Dibujo: 'categoria-dibujo',
-  'Papeles y lienzos': 'categoria-papeles',
-  'Pinceles y accesorios': 'categoria-pinceles',
-  'Kits ArtCrate': 'categoria-kits',
+  Pintura: 'winsor-newton-winton-10.webp',
+  Dibujo: 'faber-castell-pitt-pastel-24.jpg',
+  'Papeles y lienzos': 'canson-montval-300.webp',
+  'Pinceles y accesorios': 'royal-langnickel-espatulas-x5.jpg',
+  'Kits ArtCrate': 'winsor-newton-studio-case.webp',
 }
 
 export function Inicio() {
@@ -33,9 +33,9 @@ export function Inicio() {
             </div>
             <div className="col-lg-6">
               <div className="hero-collage" aria-hidden="true">
-                <img src="/assets/img/producto-03-acuarela-24-pastillas.svg" alt="" />
-                <img src="/assets/img/producto-12-kit-iniciacion-acrilico.svg" alt="" />
-                <img src="/assets/img/producto-07-lienzo-40x50.svg" alt="" />
+                <img src="/assets/img/productos/winsor-newton-cotman-bolsillo.webp" alt="" />
+                <img src="/assets/img/productos/winsor-newton-winton-10.webp" alt="" />
+                <img src="/assets/img/productos/faber-castell-pitt-pastel-24.jpg" alt="" />
               </div>
             </div>
           </div>
@@ -71,7 +71,7 @@ export function Inicio() {
             <div className="col" key={c.id}>
               <article className="card h-100 tarjeta-categoria">
                 <img
-                  src={`/assets/img/${IMAGENES_CATEGORIA[c.nombre] ?? 'categoria-kits'}.svg`}
+                  src={`/assets/img/productos/${IMAGENES_CATEGORIA[c.nombre] ?? IMAGENES_CATEGORIA.Pintura}`}
                   className="card-img-top"
                   alt={`Categoría ${c.nombre}`}
                   width="300"
