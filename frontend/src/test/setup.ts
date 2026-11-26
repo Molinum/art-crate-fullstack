@@ -7,3 +7,6 @@ afterEach(() => {
   cleanup()
   localStorage.clear()
 })
+
+// jsdom no implementa scrollTo (el detalle de producto lo usa al abrir)
+window.scrollTo = () => {}
