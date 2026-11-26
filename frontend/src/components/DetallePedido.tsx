@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ETIQUETA_ESTADO, FLUJO } from '../data/negocio'
 import { fechaHora, precioCLP } from '../services/artcrate.service'
@@ -8,12 +9,13 @@ interface Props {
   pedido: Pedido
   pago?: Pago | null
   cliente?: Usuario | null // solo lo recibe la vista de administración
+  acciones?: ReactNode // botones de gestión, bajo el seguimiento
 }
 
 const METODO: Record<string, string> = { TARJETA: 'Tarjeta', TRANSFERENCIA: 'Transferencia' }
 
 // Detalle completo de un pedido: seguimiento, productos, despacho, pago y (para el admin) cliente
-export function DetallePedido({ pedido, pago, cliente }: Props) {
+export function DetallePedido({ pedido, pago, cliente, acciones }: Props) {
   const indice = FLUJO.indexOf(pedido.estado) // -1 si está cancelado
   const unidades = pedido.items.reduce((total, i) => total + i.cantidad, 0)
 
@@ -36,6 +38,8 @@ export function DetallePedido({ pedido, pago, cliente }: Props) {
           ))}
         </ol>
       )}
+
+      {acciones}
 
       <div className="row g-4">
         <div className="col-lg-8">
@@ -76,14 +80,14 @@ export function DetallePedido({ pedido, pago, cliente }: Props) {
           <section className="card formulario-card"><div className="card-body">
             <h2 className="h6 text-uppercase text-secondary">Pago</h2>
             {pago ? (
-              <dl className="mb-0 small">
+              <dl className="mb-0 small datos-pago">
                 <dt>Método</dt><dd>{METODO[pago.metodo] ?? pago.metodo}</dd>
                 <dt>Estado</dt><dd>{pago.estado === 'APROBADO' ? 'Aprobado' : pago.estado}</dd>
                 <dt>Monto</dt><dd>{precioCLP(pago.monto)}</dd>
                 <dt>Fecha</dt><dd>{fechaHora(pago.fecha)}</dd>
                 {pago.ultimosDigitos && <><dt>Tarjeta</dt><dd>•••• {pago.ultimosDigitos}</dd></>}
                 <dt>Código de transacción</dt><dd className="text-break">{pago.codigoTransaccion}</dd>
-                <dd className="mb-0"><Link to={`/pedidos/${pedido.id}/comprobante`}>Ver comprobante</Link></dd>
+                <dd className="mb-0 datos-pago-enlace"><Link to={`/pedidos/${pedido.id}/comprobante`}>Ver comprobante</Link></dd>
               </dl>
             ) : (
               <p className="mb-0 small">{pedido.estado === 'CANCELADO' ? 'El pedido se canceló sin registrar un pago.' : 'Aún no hay un pago registrado.'}</p>

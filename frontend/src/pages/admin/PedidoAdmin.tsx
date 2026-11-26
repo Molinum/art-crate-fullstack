@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useConfirmar } from '../../components/admin/useConfirmar'
 import { DetallePedido } from '../../components/DetallePedido'
 import { Cargando, ErrorApi } from '../../components/Estado'
 import { ETIQUETA_ESTADO } from '../../data/negocio'
@@ -21,6 +22,7 @@ export function PedidoAdmin() {
   const [procesando, setProcesando] = useState(false)
   const [aviso, setAviso] = useState<string | null>(null)
   const [errorAccion, setErrorAccion] = useState<string | null>(null)
+  const [confirmar, dialogo] = useConfirmar()
 
   if (pedido.cargando && !pedido.datos) return <Cargando />
   if (pedido.error || !pedido.datos) return <ErrorApi mensaje={pedido.error ?? 'No encontramos el pedido'} />
@@ -55,32 +57,38 @@ export function PedidoAdmin() {
       {aviso && <div className="alert alert-success" role="status">{aviso}</div>}
       {errorAccion && <ErrorApi mensaje={errorAccion} />}
 
-      <DetallePedido pedido={p} pago={pagos.datos?.find((x) => x.estado === 'APROBADO') ?? null} cliente={cliente.datos} />
-
-      <section className="card formulario-card mt-4"><div className="card-body">
-        <h2 className="h5">Gestionar pedido</h2>
-        {siguiente || p.estado === 'PENDIENTE_PAGO' ? (
-          <div className="d-flex flex-wrap gap-2">
-            {siguiente && (
-              <button className="btn btn-primary" disabled={procesando} onClick={() => cambiar(siguiente)}>{TEXTO_BOTON[siguiente]}</button>
+      <DetallePedido
+        pedido={p}
+        pago={pagos.datos?.find((x) => x.estado === 'APROBADO') ?? null}
+        cliente={cliente.datos}
+        acciones={
+          <section className="card formulario-card mb-4"><div className="card-body">
+            <h2 className="h5">Gestionar pedido</h2>
+            {siguiente || p.estado === 'PENDIENTE_PAGO' ? (
+              <div className="d-flex flex-wrap gap-2">
+                {siguiente && (
+                  <button className="btn btn-primary" disabled={procesando} onClick={() => cambiar(siguiente)}>{TEXTO_BOTON[siguiente]}</button>
+                )}
+                {p.estado === 'PENDIENTE_PAGO' && (
+                  <button
+                    className="btn btn-outline-danger"
+                    disabled={procesando}
+                    onClick={async () => { if (await confirmar({ titulo: 'Cancelar pedido', mensaje: 'Los productos volverán al inventario. No se puede deshacer.', boton: 'Cancelar pedido', peligro: true })) cambiar('CANCELADO') }}
+                  >
+                    Cancelar pedido
+                  </button>
+                )}
+              </div>
+            ) : (
+              <p className="text-secondary mb-0">
+                {p.estado === 'CANCELADO' ? 'Un pedido cancelado no puede cambiar de estado.' : 'Este pedido ya fue entregado, no hay más pasos.'}
+              </p>
             )}
-            {p.estado === 'PENDIENTE_PAGO' && (
-              <button
-                className="btn btn-outline-danger"
-                disabled={procesando}
-                onClick={() => { if (window.confirm('¿Cancelar este pedido? Los productos volverán al inventario.')) cambiar('CANCELADO') }}
-              >
-                Cancelar pedido
-              </button>
-            )}
-          </div>
-        ) : (
-          <p className="text-secondary mb-0">
-            {p.estado === 'CANCELADO' ? 'Un pedido cancelado no puede cambiar de estado.' : 'Este pedido ya fue entregado, no hay más pasos.'}
-          </p>
-        )}
-        {p.estado === 'PENDIENTE_PAGO' && <p className="small text-secondary mt-2 mb-0">El pedido sigue esperando el pago del cliente; solo se puede cancelar.</p>}
-      </div></section>
+            {p.estado === 'PENDIENTE_PAGO' && <p className="small text-secondary mt-2 mb-0">El pedido sigue esperando el pago del cliente; solo se puede cancelar.</p>}
+          </div></section>
+        }
+      />
+      {dialogo}
     </>
   )
 }

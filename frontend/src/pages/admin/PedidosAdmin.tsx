@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { BarraFiltros } from '../../components/admin/BarraFiltros'
 import { Cargando, ErrorApi } from '../../components/Estado'
 import { InsigniaEstado } from '../../components/InsigniaEstado'
 import { ETIQUETA_ESTADO } from '../../data/negocio'
@@ -29,39 +30,35 @@ export function PedidosAdmin() {
   return (
     <>
       <h1 className="mb-3">Pedidos</h1>
-      <input
-        className="form-control mb-3" style={{ maxWidth: 320 }} type="search" placeholder="Buscar por N° de pedido o cliente"
-        aria-label="Buscar pedido" value={busqueda} onChange={(e) => setBusqueda(e.target.value)}
+      <BarraFiltros
+        filtros={[{ clave: '', texto: 'Todos' }, ...ESTADOS.map((e) => ({ clave: e as string, texto: ETIQUETA_ESTADO[e] }))]
+          .map((f) => ({ ...f, total: cuantos(f.clave) }))}
+        activo={estado}
+        onFiltro={(clave) => setParams(clave ? { estado: clave } : {})}
+        busqueda={busqueda}
+        onBusqueda={setBusqueda}
+        placeholder="Buscar por N° de pedido o cliente"
       />
-      <ul className="nav nav-pills mb-3 gap-2">
-        {[{ clave: '', texto: 'Todos' }, ...ESTADOS.map((e) => ({ clave: e, texto: ETIQUETA_ESTADO[e] }))].map((f) => (
-          <li className="nav-item" key={f.clave}>
-            <button className={`nav-link ${estado === f.clave ? 'active' : ''}`} onClick={() => setParams(f.clave ? { estado: f.clave } : {})}>
-              {f.texto} ({cuantos(f.clave)})
-            </button>
-          </li>
-        ))}
-      </ul>
 
       {pedidos.cargando && !pedidos.datos && <Cargando />}
       {pedidos.error && <ErrorApi mensaje={pedidos.error} />}
       {pedidos.datos && (
         <div className="table-responsive">
-          <table className="table align-middle">
+          <table className="table align-middle tabla-admin">
             <thead><tr><th>N°</th><th>Fecha</th><th>Cliente</th><th>Despacho</th><th className="text-end">Total</th><th>Estado</th><th></th></tr></thead>
             <tbody>
               {lista.map((p) => (
                 <tr key={p.id}>
-                  <td>#{p.id}</td>
-                  <td>{fechaHora(p.fecha)}</td>
-                  <td>{cliente(p.usuarioId)}</td>
-                  <td>{p.comuna}, {p.region}</td>
-                  <td className="text-end">{precioCLP(p.total)}</td>
-                  <td><InsigniaEstado estado={p.estado} /></td>
-                  <td className="text-end"><Link className="btn btn-sm btn-outline-secondary" to={`/admin/pedidos/${p.id}`}>Ver detalle</Link></td>
+                  <td className="celda-principal fw-semibold">#{p.id}</td>
+                  <td data-label="Fecha">{fechaHora(p.fecha)}</td>
+                  <td data-label="Cliente">{cliente(p.usuarioId)}</td>
+                  <td data-label="Despacho">{p.comuna}, {p.region}</td>
+                  <td data-label="Total" className="text-end">{precioCLP(p.total)}</td>
+                  <td data-label="Estado"><InsigniaEstado estado={p.estado} /></td>
+                  <td className="celda-acciones text-end"><Link className="btn btn-sm btn-outline-secondary" to={`/admin/pedidos/${p.id}`}>Ver detalle</Link></td>
                 </tr>
               ))}
-              {lista.length === 0 && <tr><td colSpan={7} className="text-center text-secondary py-4">No hay pedidos en esta vista.</td></tr>}
+              {lista.length === 0 && <tr><td colSpan={7} className="celda-principal text-center text-secondary py-4">No hay pedidos en esta vista.</td></tr>}
             </tbody>
           </table>
         </div>

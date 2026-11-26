@@ -477,3 +477,46 @@ header .navbar-nav .nav-link.active .contador-carrito { background-color: var(--
 @media print {
   header, footer, .no-imprimir { display: none !important; }
 }
+
+/* ----------------------------------------------------------
+   Panel de administración: filtros, tablas, formulario y diálogos
+   ---------------------------------------------------------- */
+.text-bg-enviado { background: #4a5a8c; color: #fff; }
+
+.barra-filtros { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between; }
+.barra-filtros .form-control { flex: 0 1 20rem; }
+
+.boton-orden { border: 0; background: none; padding: 0; font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit; white-space: nowrap; }
+.boton-orden span { opacity: 0.55; font-size: 0.7em; }
+.fila-inactiva img, .fila-inactiva .fw-semibold { opacity: 0.6; }
+.nota-accion { min-width: 6.5rem; text-align: center; }
+
+.vista-previa { aspect-ratio: 16 / 10; display: grid; place-items: center; background: #fff; border: 1.5px solid var(--ac-arena); border-radius: 14px; overflow: hidden; }
+.vista-previa img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.selector-imagenes { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 0.5rem; max-height: 15rem; overflow-y: auto; padding: 2px; }
+.selector-imagenes button { aspect-ratio: 1; padding: 4px; background: #fff; border: 1.5px solid var(--ac-arena); border-radius: 12px; }
+.selector-imagenes button[aria-pressed="true"] { border-color: var(--ac-terracota); box-shadow: 0 0 0 3px rgba(196, 98, 63, 0.3); }
+.selector-imagenes img { width: 100%; height: 100%; object-fit: contain; }
+
+.dialogo-confirmar { border: 0; border-radius: var(--ac-radio); padding: 1.5rem; max-width: min(28rem, calc(100vw - 2rem)); box-shadow: var(--ac-sombra-hover); color: var(--ac-marron); }
+.dialogo-confirmar::backdrop { background: rgba(59, 42, 32, 0.55); }
+
+.datos-pago { display: grid; grid-template-columns: auto 1fr; gap: 0.35rem 1rem; }
+.datos-pago dt, .datos-pago dd { margin: 0; }
+.datos-pago-enlace { grid-column: 1 / -1; }
+
+.kpi-enlace { color: var(--ac-terracota-oscuro); font-weight: 600; }
+
+/* En teléfonos cada fila de una tabla del panel se ve como una tarjeta, sin desplazamiento horizontal */
+@media (max-width: 767px) {
+  .tabla-admin, .tabla-admin tbody { display: block; }
+  .table.tabla-admin { background: transparent; box-shadow: none; }
+  .tabla-admin thead { display: none; }
+  .tabla-admin tbody tr { display: block; background: #fff; border-radius: var(--ac-radio); box-shadow: var(--ac-sombra); margin-bottom: 0.75rem; padding: 0.75rem 1rem; }
+  .tabla-admin.table > tbody > tr > td { display: flex; justify-content: space-between; align-items: center; gap: 1rem; text-align: right !important; border: 0; padding: 0.25rem 0; background: transparent; box-shadow: none; white-space: normal !important; }
+  .tabla-admin.table > tbody > tr > td::before { content: attr(data-label); color: #6a574b; font-size: 0.85rem; text-align: left; }
+  .tabla-admin.table > tbody > tr > td.celda-principal { justify-content: flex-start; text-align: left !important; }
+  .tabla-admin.table > tbody > tr > td.celda-principal::before, .tabla-admin.table > tbody > tr > td.celda-acciones::before { content: none; }
+  .tabla-admin.table > tbody > tr > td.celda-acciones { justify-content: flex-end; padding-top: 0.6rem; }
+  .barra-filtros .form-control { flex-basis: 100%; }
+}

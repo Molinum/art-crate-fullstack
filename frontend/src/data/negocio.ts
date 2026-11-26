@@ -16,7 +16,7 @@ export const ETIQUETA_ESTADO: Record<EstadoPedido, string> = {
 export const COLOR_ESTADO: Record<EstadoPedido, string> = {
   PENDIENTE_PAGO: 'text-bg-warning',
   PAGADO: 'text-bg-info',
-  ENVIADO: 'text-bg-primary',
+  ENVIADO: 'text-bg-enviado',
   ENTREGADO: 'text-bg-success',
   CANCELADO: 'text-bg-secondary',
 }

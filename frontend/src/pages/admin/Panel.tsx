@@ -69,20 +69,17 @@ export function Panel() {
     <>
       <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
         <h1 className="mb-0">Panel de administración</h1>
-        <div className="d-flex flex-wrap gap-2">
-          <Link className="btn btn-primary" to="/admin/productos/nuevo">Nuevo producto</Link>
-          <Link className="btn btn-outline-secondary" to="/admin/pedidos">Ver pedidos</Link>
-          <Link className="btn btn-outline-secondary" to="/">Ver tienda</Link>
-        </div>
+        <Link className="btn btn-primary" to="/admin/productos/nuevo">Nuevo producto</Link>
       </div>
 
-      <div className="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 mb-4">
+      <div className="row row-cols-2 row-cols-xl-4 g-3 g-md-4 mb-4">
         {indicadores.map((i) => (
           <div className="col" key={i.titulo}>
             <Link to={i.a} className="card tarjeta-indicador tarjeta-kpi h-100"><div className="card-body">
               <p className="text-secondary mb-1">{i.titulo}</p>
               <p className="indicador mb-0">{i.valor}</p>
               <p className="small text-secondary mb-0">{i.detalle}</p>
+              <p className="small mb-0 mt-1 kpi-enlace" aria-hidden="true">Ver →</p>
             </div></Link>
           </div>
         ))}
@@ -128,14 +125,14 @@ export function Panel() {
           <Link to="/admin/pedidos">Ver todos →</Link>
         </div>
         <div className="table-responsive">
-          <table className="table align-middle mb-0">
+          <table className="table align-middle mb-0 tabla-admin">
             <thead><tr><th>N°</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th className="text-end">Total</th><th></th></tr></thead>
             <tbody>
               {ultimos.map((p) => (
                 <tr key={p.id}>
-                  <td>#{p.id}</td><td>{cliente(p.usuarioId)}</td><td>{fechaHora(p.fecha)}</td>
-                  <td><InsigniaEstado estado={p.estado} /></td><td className="text-end">{precioCLP(p.total)}</td>
-                  <td className="text-end"><Link className="btn btn-sm btn-outline-secondary" to={`/admin/pedidos/${p.id}`}>Ver detalle</Link></td>
+                  <td className="celda-principal fw-semibold">#{p.id}</td><td data-label="Cliente">{cliente(p.usuarioId)}</td><td data-label="Fecha">{fechaHora(p.fecha)}</td>
+                  <td data-label="Estado"><InsigniaEstado estado={p.estado} /></td><td data-label="Total" className="text-end">{precioCLP(p.total)}</td>
+                  <td className="celda-acciones text-end"><Link className="btn btn-sm btn-outline-secondary" to={`/admin/pedidos/${p.id}`}>Ver detalle</Link></td>
                 </tr>
               ))}
             </tbody>
@@ -147,6 +144,7 @@ export function Panel() {
         <section className="col-lg-6">
           <div className="card formulario-card h-100"><div className="card-body">
             <h2 className="h5">Productos más vendidos</h2>
+            {vendidos.length > 0 && vendidos.length < 3 && <p className="small text-secondary">Aún hay pocas ventas para comparar.</p>}
             {masVendidos.length === 0 ? <p className="text-secondary mb-0">Aún no hay ventas confirmadas.</p> : masVendidos.map((m) => (
               <div className="mb-3" key={m.clave}>
                 <div className="d-flex justify-content-between small"><span>{m.clave}</span><span>{m.cantidad} un. · {precioCLP(m.monto)}</span></div>
