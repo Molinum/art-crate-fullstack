@@ -53,24 +53,6 @@ export function Producto() {
           <p className="precio precio-detalle">{precioCLP(p.precio)}</p>
           <p>{p.descripcion}</p>
 
-          <h2 className="h5 mt-4">Ficha técnica</h2>
-          <table className="table table-sm mb-4 ficha-tecnica">
-            <tbody>
-              {[
-                ['Marca', p.marca],
-                ['Formato', p.formato],
-                ['Contenido', p.contenido],
-                ['Categoría', p.categoriaNombre],
-                ['SKU', p.sku],
-              ].map(([nombre, valor]) => valor && (
-                <tr key={nombre}>
-                  <th scope="row">{nombre}</th>
-                  <td>{valor}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
           {disponibles !== undefined && (
             <p className="mb-3">
               {!p.activo || disponibles === 0 ? (
@@ -104,6 +86,24 @@ export function Producto() {
             </div>
           )}
           {errorAgregar && <ErrorApi mensaje={errorAgregar} />}
+
+          <h2 className="h5 mt-4">Ficha técnica</h2>
+          <table className="table table-sm mb-0 ficha-tecnica">
+            <tbody>
+              {[
+                ['Marca', p.marca],
+                ['Formato', p.formato],
+                ['Contenido', p.contenido],
+                ['Categoría', p.categoriaNombre],
+                ['SKU', p.sku],
+              ].map(([nombre, valor]) => valor && (
+                <tr key={nombre}>
+                  <th scope="row">{nombre}</th>
+                  <td>{valor}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
