@@ -101,7 +101,11 @@ export function Carrito() {
       {errorAccion && <ErrorApi mensaje={errorAccion} />}
 
       {carrito && carrito.items.length === 0 && (
-        <p>Tu carrito está vacío. <Link to="/catalogo">Ir al catálogo</Link></p>
+        <div className="card formulario-card text-center p-5 mx-auto estado-vacio">
+          <h2 className="h4">Tu carrito está vacío</h2>
+          <p className="text-secondary">Agrega pinturas, papeles o pinceles para empezar tu próxima obra.</p>
+          <Link className="btn btn-primary align-self-center" to="/catalogo">Ver catálogo</Link>
+        </div>
       )}
 
       {carrito && carrito.items.length > 0 && (

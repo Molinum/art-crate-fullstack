@@ -19,8 +19,8 @@ export function Nosotros() {
         </div>
         <div className="col-md-6">
           <figure className="mb-0">
-            <img src="/assets/img/nosotros-taller.svg" className="img-fluid rounded detalle-imagen" alt="Ilustración del taller de ArtCrate" width="800" height="500" />
-            <figcaption className="text-secondary mt-2">Nuestro taller, donde seleccionamos cada producto.</figcaption>
+            <img src="/assets/img/nosotros-taller.jpg" className="img-fluid rounded detalle-imagen" alt="Mesa de un taller con pinceles y tarros de pintura" width="1280" height="853" />
+            <figcaption className="text-secondary mt-2">El taller es donde empieza cada obra. Foto: Khara Woods (CC0), Wikimedia Commons.</figcaption>
           </figure>
         </div>
       </div>

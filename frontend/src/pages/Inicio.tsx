@@ -13,9 +13,22 @@ const IMAGENES_CATEGORIA: Record<string, string> = {
   'Kits ArtCrate': 'winsor-newton-studio-case.webp',
 }
 
+// Productos que se muestran primero en "Productos destacados" (por SKU)
+const DESTACADOS = ['ART-PIN-008', 'ART-KIT-005', 'ART-DIB-012', 'ART-PAP-009']
+
+// Íconos de línea de los beneficios (trazos SVG)
+const ICONOS = {
+  envio: 'M3 6h11v10H3zM14 10h4l3 3v3h-7M7 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4z',
+  pago: 'M6 11h12v9H6zM8 11V8a4 4 0 0 1 8 0v3M12 14v3',
+  cambios: 'M9 7 4 12l5 5M4 12h10a6 6 0 0 1 6 6',
+}
+
 export function Inicio() {
   const categorias = useApi(catalogoApi.categorias, [])
   const productos = useApi(() => catalogoApi.productos(), [])
+  // primero los elegidos; si alguno está desactivado, se completa con otros productos activos
+  const posicion = (sku: string) => (DESTACADOS.includes(sku) ? DESTACADOS.indexOf(sku) : DESTACADOS.length)
+  const destacados = (productos.datos ?? []).filter((p) => p.activo).sort((a, b) => posicion(a.sku) - posicion(b.sku)).slice(0, 4)
 
   return (
     <>
@@ -45,13 +58,17 @@ export function Inicio() {
       <section className="container pt-5">
         <div className="row row-cols-1 row-cols-md-3 g-3">
           {[
-            ['🚚', 'Envío a todo Chile', 'Despachamos en 1 a 2 días hábiles'],
-            ['🔒', 'Pago seguro', 'Tarjeta o transferencia'],
-            ['↩', 'Cambios y devoluciones', '10 días desde la recepción'],
+            [ICONOS.envio, 'Envío a todo Chile', 'Despachamos en 1 a 2 días hábiles'],
+            [ICONOS.pago, 'Pago seguro', 'Tarjeta o transferencia'],
+            [ICONOS.cambios, 'Cambios y devoluciones', '10 días desde la recepción'],
           ].map(([icono, titulo, texto]) => (
             <div className="col" key={titulo}>
               <div className="beneficio">
-                <span className="beneficio-icono" aria-hidden="true">{icono}</span>
+                <span className="beneficio-icono" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d={icono} />
+                  </svg>
+                </span>
                 <div>
                   <p className="fw-bold">{titulo}</p>
                   <p className="small text-secondary">{texto}</p>
@@ -66,7 +83,7 @@ export function Inicio() {
         <div className="seccion-titulo"><h2>Categorías</h2></div>
         {categorias.cargando && <Cargando />}
         {categorias.error && <ErrorApi mensaje={categorias.error} />}
-        <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-5 g-4">
+        <div className="row row-cols-2 row-cols-lg-5 g-3 g-md-4">
           {categorias.datos?.map((c) => (
             <div className="col" key={c.id}>
               <article className="card h-100 tarjeta-categoria">
@@ -92,8 +109,8 @@ export function Inicio() {
         <div className="seccion-titulo"><h2>Productos destacados</h2><Link to="/catalogo">Ver todo →</Link></div>
         {productos.cargando && <Cargando />}
         {productos.error && <ErrorApi mensaje={productos.error} />}
-        <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
-          {productos.datos?.filter((p) => p.activo).slice(0, 4).map((p) => <TarjetaProducto key={p.id} producto={p} />)}
+        <div className="row row-cols-2 row-cols-lg-4 g-3 g-md-4">
+          {destacados.map((p) => <TarjetaProducto key={p.id} producto={p} />)}
         </div>
       </section>
     </>

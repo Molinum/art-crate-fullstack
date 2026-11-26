@@ -354,13 +354,11 @@ header button.nav-link { background: none; border: 0; font-family: inherit; }
 
 /* Categorías: imagen completa con el nombre encima */
 .tarjeta-categoria { position: relative; border: 0 !important; border-radius: var(--ac-radio) !important; overflow: hidden; box-shadow: var(--ac-sombra); background: #fff; }
-.tarjeta-categoria .card-img-top { aspect-ratio: 4 / 5; height: auto; object-fit: contain; background: #fff; padding: 0.75rem 0.75rem 3.25rem; transition: transform 0.4s ease; }
+.tarjeta-categoria .card-img-top { aspect-ratio: 1; height: auto; object-fit: contain; background: #fff; padding: 0.75rem; transition: transform 0.4s ease; }
 .tarjeta-categoria:hover .card-img-top { transform: scale(1.06); }
-.tarjeta-categoria .card-body {
-  position: absolute; inset: auto 0 0 0; padding: 2.5rem 1rem 0.9rem;
-  background: linear-gradient(transparent, rgba(59, 42, 32, 0.85));
-}
-.tarjeta-categoria .card-title a { color: #fff !important; font-size: 1.05rem; }
+.tarjeta-categoria .card-body { position: relative; z-index: 1; background: #fff; padding: 0.75rem; text-align: center; }
+.tarjeta-categoria .card-title { margin: 0; }
+.tarjeta-categoria .card-title a { color: var(--ac-marron) !important; font-size: 1rem; }
 
 /* Productos */
 .tarjeta-producto { border: 0 !important; border-radius: var(--ac-radio) !important; background: #fff; box-shadow: var(--ac-sombra); overflow: hidden; }
@@ -375,6 +373,8 @@ header button.nav-link { background: none; border: 0; font-family: inherit; }
 .precio { color: var(--ac-marron); font-weight: 700; }
 
 /* Chips de filtro y búsqueda */
+.buscador-catalogo .form-control { flex: 1 1 14rem; width: auto; }
+.estado-vacio { max-width: 34rem; }
 .nav-pills .nav-link { border-radius: 999px; font-weight: 600; font-size: 0.9rem; background: #fff; border: 1px solid var(--ac-arena); color: var(--ac-marron); padding: 0.45rem 1.1rem; }
 .nav-pills .nav-link:hover { background: var(--ac-terracota); border-color: var(--ac-terracota); color: #fff; }
 .nav-pills .nav-link.active { background: var(--ac-terracota); border-color: var(--ac-terracota); color: #fff; }
@@ -389,7 +389,7 @@ header button.nav-link { background: none; border: 0; font-family: inherit; }
 
 /* Detalle, carrito y tablas */
 .detalle-imagen { border: 0; border-radius: 24px; box-shadow: var(--ac-sombra); background: #fff; }
-.detalle-imagen { aspect-ratio: 1; object-fit: contain; padding: 1rem; }
+.detalle-imagen.foto-producto { aspect-ratio: 1; object-fit: contain; padding: 1rem; }
 .precio-detalle { font-size: 2rem; }
 .imagen-carrito { width: 64px; height: 64px; object-fit: contain; border-radius: 12px; border: 0; background: #fff; }
 .table { --bs-table-bg: #fff; border-radius: var(--ac-radio); overflow: hidden; box-shadow: var(--ac-sombra); }
@@ -423,6 +423,10 @@ header .admin-navbar .nav-link.active { background: var(--ac-terracota); color: 
 }
 @media (max-width: 576px) {
   .seccion-titulo { flex-direction: column; align-items: start; }
+  /* dos tarjetas por fila: menos relleno y texto un poco más chico */
+  .tarjeta-producto .card-body { padding: 0.7rem 0.75rem 0.85rem; }
+  .tarjeta-producto .card-title { font-size: 0.9rem; }
+  .tarjeta-producto .btn { font-size: 0.8rem; padding-inline: 0.4rem; }
 }
 
 /* Tabla del carrito: columnas de ancho fijo para que cambiar un valor no mueva el resto */

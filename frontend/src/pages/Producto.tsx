@@ -1,18 +1,31 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Cargando, ErrorApi } from '../components/Estado'
+import { TarjetaProducto } from '../components/TarjetaProducto'
 import { useCarrito } from '../context/CarritoContext'
 import { useSesion } from '../context/SesionContext'
 import { useApi } from '../hooks'
 import { carritoApi, catalogoApi, inventarioApi, precioCLP, unidadesCarrito, urlImagen } from '../services/artcrate.service'
 
+// La "key" hace que al pasar a un producto relacionado la página parta de cero (cantidad y mensajes)
 export function Producto() {
+  const { id } = useParams()
+  return <DetalleProducto key={id} />
+}
+
+function DetalleProducto() {
   const { id } = useParams()
   const navegar = useNavigate()
   const { usuario } = useSesion()
   const { fijarCantidad } = useCarrito()
   const { datos: p, cargando, error } = useApi(() => catalogoApi.producto(Number(id)), [id])
   const stock = useApi(() => inventarioApi.deProducto(Number(id)), [id])
+  const mismaCategoria = useApi(
+    () => (p ? catalogoApi.productos(p.categoriaId) : Promise.resolve([])),
+    [p?.categoriaId],
+  )
+  const relacionados = (mismaCategoria.datos ?? []).filter((r) => r.activo && r.id !== p?.id).slice(0, 4)
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }) }, [])
   const disponibles = stock.datos?.cantidad // undefined mientras carga o si falla
   // lo escrito en el campo se guarda como texto para poder borrarlo mientras se escribe; la cantidad real se corrige al enviar
   const [textoCantidad, setTextoCantidad] = useState('1')
@@ -45,7 +58,7 @@ export function Producto() {
       </nav>
       <div className="row g-4 gx-lg-5">
         <div className="col-md-6">
-          <img className="detalle-imagen img-fluid" src={urlImagen(p.imagenUrl)} alt={p.nombre} />
+          <img className="detalle-imagen foto-producto img-fluid" src={urlImagen(p.imagenUrl)} alt={p.nombre} />
         </div>
         <div className="col-md-6">
           <p className="text-muted mb-1">{p.categoriaNombre} · {p.sku}</p>
@@ -106,6 +119,15 @@ export function Producto() {
           </table>
         </div>
       </div>
+
+      {relacionados.length > 0 && (
+        <section className="mt-5" aria-label="Productos relacionados">
+          <h2 className="h4 mb-3">También te puede interesar</h2>
+          <div className="row row-cols-2 row-cols-lg-4 g-3 g-md-4">
+            {relacionados.map((r) => <TarjetaProducto key={r.id} producto={r} />)}
+          </div>
+        </section>
+      )}
     </div>
   )
 }

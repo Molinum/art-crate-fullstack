@@ -59,7 +59,7 @@ export function Catalogo() {
         ))}
       </ul>
 
-      <form className="d-flex flex-wrap gap-2 mb-4" onSubmit={buscar}>
+      <form className="d-flex flex-wrap gap-2 mb-4 buscador-catalogo" onSubmit={buscar}>
         <input
           className="form-control"
           type="search"
@@ -80,7 +80,7 @@ export function Catalogo() {
       {productos.error && <ErrorApi mensaje={productos.error} />}
       {productos.datos && <p className="text-secondary small">{lista.length} {lista.length === 1 ? 'producto' : 'productos'}</p>}
       {productos.datos && lista.length === 0 && <p>No hay productos que coincidan.</p>}
-      <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+      <div className="row row-cols-2 row-cols-lg-4 g-3 g-md-4">
         {lista.map((p) => (
           <TarjetaProducto key={p.id} producto={p} agregable stock={stock.datos?.find((s) => s.productoId === p.id)?.cantidad} />
         ))}

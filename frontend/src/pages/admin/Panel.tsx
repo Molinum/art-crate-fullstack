@@ -59,8 +59,8 @@ export function Panel() {
   const maxCategoria = porCategoria[0]?.monto || 1
 
   const indicadores = [
-    { titulo: 'Ventas confirmadas', valor: precioCLP(ventas), detalle: `${vendidos.length} pedidos`, a: '/admin/pedidos' },
-    { titulo: 'Por enviar', valor: String(porEnviar.length), detalle: 'pedidos pagados', a: '/admin/pedidos?estado=PAGADO' },
+    { titulo: 'Ventas confirmadas', valor: precioCLP(ventas), detalle: `${vendidos.length} ${vendidos.length === 1 ? 'pedido' : 'pedidos'}`, a: '/admin/pedidos' },
+    { titulo: 'Por enviar', valor: String(porEnviar.length), detalle: porEnviar.length === 1 ? 'pedido pagado' : 'pedidos pagados', a: '/admin/pedidos?estado=PAGADO' },
     { titulo: 'Pendientes de pago', valor: String(pendientes.length), detalle: precioCLP(pendientes.reduce((t, p) => t + p.total, 0)), a: '/admin/pedidos?estado=PENDIENTE_PAGO' },
     { titulo: 'Stock bajo', valor: String(stockBajo.length + sinStock.length), detalle: `${sinStock.length} sin stock`, a: '/admin/productos?filtro=stock-bajo' },
   ]
@@ -112,7 +112,7 @@ export function Panel() {
                 {[...sinStock, ...stockBajo].slice(0, 5).map((p) => (
                   <li className="list-group-item d-flex justify-content-between align-items-center px-0" key={p.id}>
                     <span>{p.nombre} <span className={`badge ms-1 ${unidadesEnStock(p.id) === 0 ? 'text-bg-danger' : 'text-bg-warning'}`}>
-                      {unidadesEnStock(p.id) === 0 ? 'Sin stock' : `${unidadesEnStock(p.id)} unidades`}</span></span>
+                      {unidadesEnStock(p.id) === 0 ? 'Sin stock' : `${unidadesEnStock(p.id)} ${unidadesEnStock(p.id) === 1 ? 'unidad' : 'unidades'}`}</span></span>
                     <Link className="btn btn-sm btn-outline-secondary" to={`/admin/productos/${p.id}`}>Reponer</Link>
                   </li>
                 ))}
