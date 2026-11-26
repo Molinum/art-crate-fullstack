@@ -2,3 +2,6 @@
 Thumbs.db
 .idea/
 *.iml
+
+# Dependencias de npm (el frontend tiene la suya en frontend/node_modules)
+node_modules/
